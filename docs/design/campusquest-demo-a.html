@@ -133,20 +133,22 @@ body { margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1
 .hero { position: relative; overflow: hidden; }
 .hero > *:not(.embers) { position: relative; }
 
-/* ═══════ 5. 难度双通道 v2：宝石徽记 + 炉石式边框 + 颜色遮罩（§0.3） ═══════ */
-.quest-card { position: relative; padding: var(--sp-4) var(--sp-4) var(--sp-3); border-radius: 14px; }
+/* ═══════ 5. 难度双通道 v3：炉石式三区卡片（插画区 / 绶带标题 / 文字区）+ 边框 + 粒子 + 3D ═══════ */
+.quest-card { position: relative; padding: 0; border-radius: 16px; }
 .quest-card--board { cursor: grab; touch-action: none; }
 .quest-card--board:active { cursor: grabbing; }
-/* 颜色遮罩 + 光泽（裁剪层，随卡片圆角） */
-.card-clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+/* 颜色遮罩 + 眩光 + 光泽（裁剪层，随卡片圆角） */
+.card-clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 1; }
 .card-clip .tint { position: absolute; inset: 0; }
-.card-clip .sheen { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.3) 50%, transparent 60%); transform: translateX(-130%); transition: transform .9s cubic-bezier(.2, 0, 0, 1); }
+.card-clip .glare { position: absolute; inset: 0; background: radial-gradient(240px circle at var(--gx, 50%) var(--gy, 20%), rgba(255, 246, 220, .28), transparent 62%); opacity: 0; transition: opacity .35s ease; }
+.quest-card:hover .glare, .quest-card:focus-within .glare { opacity: 1; }
+.card-clip .sheen { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .3) 50%, transparent 60%); transform: translateX(-130%); transition: transform .9s cubic-bezier(.2, 0, 0, 1); }
 .quest-card:hover .sheen, .quest-card:focus-within .sheen { transform: translateX(130%); }
 [data-tier="NORMAL"] .tint { background: linear-gradient(180deg, rgba(90, 74, 48, .06), rgba(90, 74, 48, .02) 50%, rgba(90, 74, 48, .1)); }
 [data-tier="RARE"] .tint { background: linear-gradient(180deg, rgba(47, 93, 138, .17), rgba(47, 93, 138, .05) 48%, rgba(47, 93, 138, .22)); }
 [data-tier="EPIC"] .tint { background: linear-gradient(180deg, rgba(109, 74, 158, .19), rgba(109, 74, 158, .06) 48%, rgba(109, 74, 158, .24)); }
 [data-tier="LEGENDARY"] .tint { background: linear-gradient(180deg, rgba(217, 164, 65, .24), rgba(217, 164, 65, .09) 48%, rgba(217, 164, 65, .28)); }
-.quest-card > :not(.card-clip):not(.stud):not(.orn):not(.frame-gem) { position: relative; }
+.quest-card > :not(.card-clip):not(.stud):not(.orn):not(.frame-gem) { position: relative; z-index: 2; }
 
 /* 炉石式边框：厚金属渐变框 + 内倒角高光 */
 .quest-card[data-tier="NORMAL"] { background: linear-gradient(180deg, #fbf5e7, #f3ead4); border: 3px solid #8a7550; box-shadow: inset 0 0 0 1.5px #e9dcba, inset 0 0 0 3px #c9b98f, var(--shadow-1); }
@@ -154,27 +156,54 @@ body { margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1
 .quest-card[data-tier="EPIC"] { border: 5px solid transparent; background: linear-gradient(180deg, #faf4e9, #f1e7d0) padding-box, linear-gradient(160deg, #c3a8ea, #6d4a9e 45%, #422a66 80%, #8d6cc0) border-box; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .4), inset 0 0 22px rgba(109, 74, 158, .24), var(--shadow-1); }
 .quest-card[data-tier="LEGENDARY"] { border: 6px solid transparent; background: linear-gradient(180deg, #fcf6e6, #f4ead0) padding-box, linear-gradient(160deg, #ffe9a8, #d9a441 38%, #8a6410 72%, #c9971f) border-box; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .45), inset 0 0 0 4px rgba(138, 100, 16, .35), inset 0 0 26px rgba(217, 164, 65, .28), var(--shadow-2); }
 
-/* 四角铆钉（金属圆钉，随档换色） */
-.stud { position: absolute; width: 11px; height: 11px; border-radius: 50%; pointer-events: none; box-shadow: 0 1px 2px rgba(0, 0, 0, .45), inset 0 1px 1px rgba(255, 255, 255, .55); z-index: 2; }
+/* 四角铆钉 */
+.stud { position: absolute; width: 11px; height: 11px; border-radius: 50%; pointer-events: none; box-shadow: 0 1px 2px rgba(0, 0, 0, .45), inset 0 1px 1px rgba(255, 255, 255, .55); z-index: 3; }
 [data-tier="NORMAL"] .stud { background: radial-gradient(circle at 35% 30%, #cbb98e, #6f5c39); }
 [data-tier="RARE"] .stud { background: radial-gradient(circle at 35% 30%, #bcd6ec, #1c3d5e); }
 [data-tier="EPIC"] .stud { background: radial-gradient(circle at 35% 30%, #dcc8f5, #422a66); }
 [data-tier="LEGENDARY"] .stud { background: radial-gradient(circle at 35% 30%, #ffe9a8, #8a6410); }
-.stud.tl { top: 7px; left: 7px; }
-.stud.tr { top: 7px; right: 7px; }
-.stud.bl { bottom: 7px; left: 7px; }
-.stud.br { bottom: 7px; right: 7px; }
+.stud.tl { top: 8px; left: 8px; }
+.stud.tr { top: 8px; right: 8px; }
+.stud.bl { bottom: 8px; left: 8px; }
+.stud.br { bottom: 8px; right: 8px; }
 
 /* 花角饰件（史诗/传说） */
-.orn { position: absolute; width: 16px; height: 16px; border: 2.5px solid var(--rarity-epic); opacity: .95; pointer-events: none; z-index: 2; }
-.orn.tl { top: 7px; left: 7px; border-right: 0; border-bottom: 0; border-top-left-radius: 6px; }
-.orn.tr { top: 7px; right: 7px; border-left: 0; border-bottom: 0; border-top-right-radius: 6px; }
-.orn.bl { bottom: 7px; left: 7px; border-right: 0; border-top: 0; border-bottom-left-radius: 6px; }
-.orn.br { bottom: 7px; right: 7px; border-left: 0; border-top: 0; border-bottom-right-radius: 6px; }
-[data-tier="LEGENDARY"] .orn { border-color: #8a6410; width: 18px; height: 18px; }
-/* 传说：顶嵌框宝石（SVG 注入） */
-.frame-gem { position: absolute; top: -13px; left: 50%; translate: -50% 0; width: 24px; height: 24px; pointer-events: none; z-index: 3; }
+.orn { position: absolute; width: 17px; height: 17px; border: 2.5px solid var(--rarity-epic); opacity: .95; pointer-events: none; z-index: 3; }
+.orn.tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; border-top-left-radius: 6px; }
+.orn.tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; border-top-right-radius: 6px; }
+.orn.bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; border-bottom-left-radius: 6px; }
+.orn.br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; border-bottom-right-radius: 6px; }
+[data-tier="LEGENDARY"] .orn { border-color: #8a6410; width: 19px; height: 19px; }
+.frame-gem { position: absolute; top: -14px; left: 50%; translate: -50% 0; width: 26px; height: 26px; pointer-events: none; z-index: 4; }
 .frame-gem svg { width: 100%; height: 100%; }
+
+/* ── 三区结构 ── */
+/* 区一：插画（委托场景，内嵌 SVG；档位色辉光） */
+.quest-art { position: relative; height: 9.75rem; overflow: hidden; border-radius: 11px 11px 0 0; border-bottom: 2.5px solid rgba(51, 41, 28, .35); }
+[data-tier="RARE"] .quest-art { border-bottom-color: #1c3d5e; }
+[data-tier="EPIC"] .quest-art { border-bottom-color: #422a66; }
+[data-tier="LEGENDARY"] .quest-art { border-bottom-color: #8a6410; }
+.quest-art .glow { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+[data-tier="NORMAL"] .quest-art .glow { background: radial-gradient(130% 95% at 50% 8%, rgba(138, 117, 80, .2), transparent 68%); }
+[data-tier="RARE"] .quest-art .glow { background: radial-gradient(130% 95% at 50% 8%, rgba(87, 136, 177, .4), transparent 68%); }
+[data-tier="EPIC"] .quest-art .glow { background: radial-gradient(130% 95% at 50% 8%, rgba(141, 108, 192, .42), transparent 68%); }
+[data-tier="LEGENDARY"] .quest-art .glow { background: radial-gradient(130% 95% at 50% 8%, rgba(255, 224, 138, .5), transparent 68%); }
+.quest-art svg { position: relative; width: 100%; height: 100%; display: block; }
+/* 卡内粒子（档位色光点，CSS 动画；普通档安静无粒子） */
+.card-sparkles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+.card-sparkles i { position: absolute; bottom: -8px; width: 4px; height: 4px; border-radius: 50%; background: var(--spark, #ffd97a); box-shadow: 0 0 6px var(--spark, #ffd97a); opacity: 0; animation: cardSpark 4s linear infinite; }
+@keyframes cardSpark { 0% { transform: translateY(0) scale(.5); opacity: 0; } 12% { opacity: .9; } 75% { opacity: .45; } 100% { transform: translateY(-10.5rem) scale(1.1); opacity: 0; } }
+.motion-off .card-sparkles i { animation: none; opacity: 0; }
+/* 区二：名称绶带（分隔音区与文字区） */
+.quest-banner { margin: -1px var(--sp-2) 0; padding: .5rem 1.1rem; text-align: center; background: linear-gradient(180deg, #77552f, #4a3620 58%, #6f5330); clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .3)); }
+.quest-title { margin: 0; font-family: var(--font-display); font-size: 1rem; font-weight: 800; line-height: 1.4; color: #f7edd2; letter-spacing: .02em; text-shadow: 0 1px 0 rgba(0, 0, 0, .55); overflow-wrap: anywhere; }
+.quest-title a { color: inherit; text-decoration: none; }
+.quest-title a:hover { color: #ffe9a8; }
+/* 区三：文字区（meta + 宝石 + 操作） */
+.quest-body { display: grid; gap: var(--sp-2); padding: var(--sp-3) var(--sp-3) var(--sp-2); }
+.quest-meta { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); font-size: .75rem; color: var(--muted); }
+.quest-foot { display: grid; justify-items: center; gap: 2px; }
+.quest-actions { display: flex; justify-content: flex-end; padding: 0 var(--sp-3) var(--sp-3); }
 
 /* 宝石徽记（无文字；形状分档：圆珠/圆宝石/六棱/钻石） */
 .gem-badge { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3)); }
@@ -182,18 +211,11 @@ body { margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1
 .gem-badge.sm { width: 1.9rem; height: 1.9rem; }
 .rarity-caption { margin: 0; text-align: center; font-size: .6875rem; font-weight: 700; letter-spacing: .3em; text-indent: .3em; color: var(--muted); }
 
-/* 点数硬币（右上角，突出） */
-.cost-coin { position: absolute; top: -13px; right: 12px; z-index: 3; width: 3.5rem; height: 3.5rem; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 32% 28%, #ffedb5, #e8b64c 52%, #8a6410); border: 2.5px solid #8a6410; box-shadow: 0 4px 10px rgba(0, 0, 0, .32), inset 0 0 0 3px rgba(255, 255, 255, .35); }
+/* 点数硬币（左上角，炉石法力水晶位） */
+.cost-coin { position: absolute; top: -13px; left: 12px; z-index: 4; width: 3.5rem; height: 3.5rem; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 32% 28%, #ffedb5, #e8b64c 52%, #8a6410); border: 2.5px solid #8a6410; box-shadow: 0 4px 10px rgba(0, 0, 0, .32), inset 0 0 0 3px rgba(255, 255, 255, .35); }
 .cost-coin b { font-family: var(--font-display); font-size: 1.2rem; font-weight: 800; color: #3a2404; line-height: 1; }
 .cost-coin span { position: absolute; bottom: 3px; font-size: .5rem; font-weight: 700; letter-spacing: .3em; text-indent: .3em; color: #5b3d08; }
 
-/* 标题强调：衬线大字 + 底部分隔线 */
-.quest-title { margin: 0 0 var(--sp-2); font-family: var(--font-display); font-size: 1.0625rem; font-weight: 800; line-height: 1.45; padding-bottom: var(--sp-2); border-bottom: 2px solid color-mix(in srgb, var(--ink) 16%, transparent); text-shadow: 0 1px 0 rgba(255, 255, 255, .5); overflow-wrap: anywhere; }
-.quest-title a { color: var(--ink); text-decoration: none; }
-.quest-title a:hover { color: var(--primary); }
-.quest-meta { display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); font-size: .75rem; color: var(--muted); }
-.quest-foot { display: grid; justify-items: center; gap: 2px; margin-top: var(--sp-2); }
-.quest-actions { display: flex; justify-content: flex-end; margin-top: var(--sp-2); }
 .task-grid { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr)); align-content: start; list-style: none; margin: 0; padding: 0; }
 @media (max-width: 40rem) { .task-grid { grid-template-columns: 1fr; } }
 
@@ -382,7 +404,25 @@ dialog.scrollx::backdrop { background: var(--scrim); }
 /* 纸脚火漆印装饰 */
 .parch-seal { position: absolute; left: 50%; bottom: var(--sp-3); translate: -50% 0; width: 2.7rem; height: 2.7rem; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--on-primary); background: radial-gradient(circle at 32% 30%, #c04a3a, #8c231c 68%); box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .25), 0 2px 5px rgba(0, 0, 0, .3); transform: rotate(-6deg); pointer-events: none; }
 .parch-seal::after { content: "CAMPUS REQUEST"; position: absolute; bottom: .35rem; font-size: .375rem; letter-spacing: .18em; opacity: .8; }
-.dialog-title { margin: 0 0 var(--sp-2); font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; }
+/* 中世纪雕线内框（纸身内侧双线） */
+.scroll-paper::after { content: ""; position: absolute; inset: 11px; border: 1.5px solid rgba(120, 98, 60, .55); border-radius: 12px; pointer-events: none; box-shadow: inset 0 0 0 3.5px rgba(255, 255, 255, .28); }
+/* 四角金属包角（黄铜） */
+.parch-corner { position: absolute; width: 22px; height: 22px; border: 3.5px solid #a8791c; pointer-events: none; z-index: 3; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .3)); }
+.parch-corner.tl { top: 13px; left: 11px; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; }
+.parch-corner.tr { top: 13px; right: 11px; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; }
+.parch-corner.bl { bottom: 13px; left: 11px; border-right: 0; border-top: 0; border-bottom-left-radius: 10px; }
+.parch-corner.br { bottom: 13px; right: 11px; border-left: 0; border-top: 0; border-bottom-right-radius: 10px; }
+/* 纸面金屑粒子 */
+.parch-sparks { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; z-index: 1; }
+.parch-sparks i { position: absolute; bottom: 10px; width: 3.5px; height: 3.5px; border-radius: 50%; background: #e8b64c; box-shadow: 0 0 7px rgba(232, 182, 76, .8); opacity: 0; animation: parchSpark 4s linear infinite; }
+@keyframes parchSpark { 0% { transform: translate(0, 0) scale(.5); opacity: 0; } 10% { opacity: .85; } 70% { opacity: .4; } 100% { transform: translate(16px, -16rem) scale(1.1); opacity: 0; } }
+.motion-off .parch-sparks i { animation: none; opacity: 0; }
+/* 背板：暖色辉光 + 压暗 */
+dialog.scrollx::backdrop { background: radial-gradient(58% 46% at 50% 42%, rgba(217, 164, 65, .16), transparent 62%), var(--scrim); }
+.dialog-title { margin: 0 0 var(--sp-2); font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; text-align: center; }
+/* 标题饰线：金线 + 中心菱形 */
+.dialog-title::after { content: ""; display: block; margin: .55rem auto 0; width: 68%; height: 2px; background: linear-gradient(90deg, transparent, #a8791c 28%, #d9a441 50%, #a8791c 72%, transparent); }
+.dialog-title::before { content: ""; display: block; margin: .95rem auto -0.65rem; width: 8px; height: 8px; background: #a8791c; transform: rotate(45deg); box-shadow: 0 0 0 2px rgba(255, 255, 255, .3); position: relative; z-index: 1; }
 .dialog-body { display: grid; gap: var(--sp-3); }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 .dialog-actions .btn { flex: 1 1 auto; }
@@ -512,27 +552,47 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
         <ul class="task-grid">
           <li class="quest-card" data-tier="EPIC">
             <div class="cost-coin" role="img" aria-label="报酬 240 令"><b class="num">240</b><span>令</span></div>
-            <h3 class="quest-title"><a href="#detail">抖音「城市夜跑」话题数据表</a></h3>
-            <p class="quest-meta"><span>抖音</span><span class="num">剩余 12 / 30</span><span>10-12 截止</span></p>
-            <div class="quest-foot"><span class="gem-badge" data-gem="EPIC"></span><span class="rarity-caption">史诗</span></div>
+            <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+              <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#2a2350"/><circle cx="44" cy="26" r="11" fill="#f4ead0" opacity=".9"/><g fill="#1d1836"><rect x="8" y="44" width="26" height="52"/><rect x="40" y="30" width="20" height="66"/><rect x="66" y="52" width="30" height="44"/><rect x="102" y="24" width="22" height="72"/><rect x="130" y="46" width="28" height="50"/><rect x="164" y="34" width="24" height="62"/></g><g fill="#cdb0f5" opacity=".7"><rect x="46" y="38" width="3" height="4"/><rect x="52" y="46" width="3" height="4"/><rect x="108" y="32" width="3" height="4"/><rect x="112" y="44" width="3" height="4"/><rect x="170" y="42" width="3" height="4"/><rect x="76" y="60" width="3" height="4"/></g><path d="M0 108 H200" stroke="#3a3060" stroke-width="6"/><g stroke="#e8b64c" stroke-width="3" fill="none" stroke-linecap="round"><circle cx="128" cy="66" r="5" fill="#e8b64c"/><path d="M128 71 L128 88 M128 88 L120 100 M128 88 L136 100 M128 76 L118 82 M128 76 L140 72"/></g><path d="M96 74 h16 M92 82 h14" stroke="#8d6cc0" stroke-width="2.5" stroke-linecap="round" opacity=".8"/></svg>
+            </div>
+            <div class="quest-banner"><h3 class="quest-title"><a href="#detail">抖音「城市夜跑」话题数据表</a></h3></div>
+            <div class="quest-body">
+              <p class="quest-meta"><span>抖音</span><span class="num">剩余 12 / 30</span><span>10-12 截止</span></p>
+              <div class="quest-foot"><span class="gem-badge" data-gem="EPIC"></span><span class="rarity-caption">史诗</span></div>
+            </div>
           </li>
           <li class="quest-card" data-tier="LEGENDARY">
             <div class="cost-coin" role="img" aria-label="报酬 320 令"><b class="num">320</b><span>令</span></div>
-            <h3 class="quest-title"><a href="#detail">B站「期末复习vlog」评论采集</a></h3>
-            <p class="quest-meta"><span>哔哩哔哩</span><span class="num">剩余 2 / 8</span><span>10-15 截止</span></p>
-            <div class="quest-foot"><span class="gem-badge" data-gem="LEGENDARY"></span><span class="rarity-caption">传说</span></div>
+            <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+              <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#232748"/><circle cx="170" cy="22" r="10" fill="#f4ead0"/><circle cx="165" cy="19" r="8" fill="#232748"/><g fill="#ffd97a"><circle cx="28" cy="20" r="1.6"/><circle cx="60" cy="12" r="1.3"/><circle cx="96" cy="24" r="1.5"/><circle cx="130" cy="14" r="1.3"/><circle cx="146" cy="34" r="1.4"/></g><rect x="20" y="78" width="160" height="8" rx="2" fill="#6f5330"/><rect x="118" y="34" width="58" height="40" rx="6" fill="#14162b" stroke="#e8b64c" stroke-width="2.5"/><path d="M142 46 L142 62 L156 54 Z" fill="#e8b64c"/><rect x="34" y="52" width="52" height="10" rx="3" fill="#f4ead0" transform="rotate(-6 60 57)"/><rect x="38" y="64" width="44" height="10" rx="3" fill="#e3d3ab" transform="rotate(-6 60 69)"/><path d="M30 78 L46 44 L60 78 Z" fill="#9a6a3c" opacity=".25"/></svg>
+            </div>
+            <div class="quest-banner"><h3 class="quest-title"><a href="#detail">B站「期末复习vlog」评论采集</a></h3></div>
+            <div class="quest-body">
+              <p class="quest-meta"><span>哔哩哔哩</span><span class="num">剩余 2 / 8</span><span>10-15 截止</span></p>
+              <div class="quest-foot"><span class="gem-badge" data-gem="LEGENDARY"></span><span class="rarity-caption">传说</span></div>
+            </div>
           </li>
           <li class="quest-card" data-tier="RARE">
             <div class="cost-coin" role="img" aria-label="报酬 180 令"><b class="num">180</b><span>令</span></div>
-            <h3 class="quest-title"><a href="#detail">微博「校园歌手大赛」热议榜</a></h3>
-            <p class="quest-meta"><span>微博</span><span class="num">剩余 9 / 25</span><span>10-10 截止</span></p>
-            <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+            <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+              <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#2b3a55"/><path d="M100 0 L58 120 H142 Z" fill="#4c7ba6" opacity=".35"/><rect x="0" y="102" width="200" height="18" fill="#1c2a3e"/><g transform="rotate(24 128 44)"><rect x="122" y="30" width="12" height="26" rx="6" fill="#c9c9d6"/><rect x="124" y="56" width="8" height="6" fill="#8a8a9a"/><path d="M128 62 V88" stroke="#c9c9d6" stroke-width="4"/><path d="M118 88 h20" stroke="#c9c9d6" stroke-width="4" stroke-linecap="round"/></g><g fill="none" stroke="#ffd97a" stroke-width="2.5"><path d="M64 52 v-16 l10 -3 v16"/><circle cx="61" cy="52" r="3.4"/><circle cx="71" cy="49" r="3.4"/><path d="M84 66 v-12 l8 -2 v12" stroke-width="2.2"/><circle cx="81.5" cy="66" r="3"/><circle cx="89.5" cy="64" r="3"/></g><circle cx="100" cy="10" r="3" fill="#fff" opacity=".8"/><circle cx="150" cy="16" r="2.4" fill="#fff" opacity=".6"/><circle cx="36" cy="14" r="2.2" fill="#fff" opacity=".5"/></svg>
+            </div>
+            <div class="quest-banner"><h3 class="quest-title"><a href="#detail">微博「校园歌手大赛」热议榜</a></h3></div>
+            <div class="quest-body">
+              <p class="quest-meta"><span>微博</span><span class="num">剩余 9 / 25</span><span>10-10 截止</span></p>
+              <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+            </div>
           </li>
           <li class="quest-card" data-tier="NORMAL">
             <div class="cost-coin" role="img" aria-label="报酬 100 令"><b class="num">100</b><span>令</span></div>
-            <h3 class="quest-title"><a href="#detail">豆瓣「秋日书单」标记数据</a></h3>
-            <p class="quest-meta"><span>豆瓣</span><span class="num">剩余 30 / 50</span><span>10-18 截止</span></p>
-            <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+            <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+              <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#f0e2c2"/><path d="M100 96 C 70 78 46 80 30 90 L30 46 C 46 36 70 38 100 56 C 130 38 154 36 170 46 L170 90 C 154 80 130 78 100 96 Z" fill="#8a7550"/><path d="M100 90 C 74 74 52 76 38 84 L38 52 C 52 44 74 46 100 62 C 126 46 148 44 162 52 L162 84 C 148 76 126 74 100 90 Z" fill="#fbf5e7"/><path d="M100 62 V90" stroke="#c9b98f" stroke-width="2"/><g stroke="#c9b98f" stroke-width="1.6"><path d="M48 60 h38 M48 66 h34 M114 60 h38 M114 66 h34"/></g><g fill="#c98a2c"><path d="M36 24 q6 4 4 10 q-8 0 -8 -6 q0 -3 4 -4" opacity=".85"/><path d="M158 18 q7 3 6 10 q-9 1 -9 -5 q0 -3 3 -5" opacity=".7"/><path d="M84 14 q6 3 5 9 q-8 1 -9 -4 q0 -3 4 -5" opacity=".6"/></g></svg>
+            </div>
+            <div class="quest-banner"><h3 class="quest-title"><a href="#detail">豆瓣「秋日书单」标记数据</a></h3></div>
+            <div class="quest-body">
+              <p class="quest-meta"><span>豆瓣</span><span class="num">剩余 30 / 50</span><span>10-18 截止</span></p>
+              <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+            </div>
           </li>
         </ul>
       </div>
@@ -586,44 +646,74 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
       <div class="board-outer"><div class="board-inner" id="questBoard">
         <article class="quest-card quest-card--board" data-tier="RARE">
           <div class="cost-coin" role="img" aria-label="报酬 160 令"><b class="num">160</b><span>令</span></div>
-          <h3 class="quest-title">小红书「秋日露营」数据采集</h3>
-          <p class="quest-meta"><span>小红书</span><span class="num">剩余 3 / 40</span><span>今天 18:00 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#f0e0bd"/><circle cx="160" cy="26" r="13" fill="#e8b64c"/><path d="M0 84 Q50 64 100 82 T200 80 V120 H0 Z" fill="#c9a86a"/><path d="M0 96 Q60 82 120 96 T200 92 V120 H0 Z" fill="#a8834f"/><path d="M28 92 L58 92 L43 58 Z" fill="#b0453a"/><path d="M43 92 L43 78 L50 92 Z" fill="#7e211b"/><path d="M150 88 L150 66 M150 66 L142 78 M150 66 L158 78" stroke="#5f4e33" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M148 40 L156 58 L140 58 Z" fill="#4a7c3f"/><path d="M146 52 L158 52 L152 36 Z" fill="#5f9450"/><path d="M78 92 Q84 78 90 92 Q84 88 78 92" fill="#d9772e"/><path d="M84 92 Q88 82 92 92 Q88 89 84 92" fill="#e8b64c"/><path d="M72 94 h30 M76 98 h22" stroke="#6f5c39" stroke-width="3" stroke-linecap="round"/><path d="M30 26 q6 -6 12 0 M46 18 q5 -5 10 0" stroke="#8c7f69" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">小红书「秋日露营」数据采集</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>小红书</span><span class="num">剩余 3 / 40</span><span>今天 18:00 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
         <article class="quest-card quest-card--board" data-tier="LEGENDARY">
           <div class="cost-coin" role="img" aria-label="报酬 320 令"><b class="num">320</b><span>令</span></div>
-          <h3 class="quest-title">B站「期末复习vlog」评论采集</h3>
-          <p class="quest-meta"><span>哔哩哔哩</span><span class="num">剩余 2 / 8</span><span>10-15 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="LEGENDARY"></span><span class="rarity-caption">传说</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#232748"/><circle cx="170" cy="22" r="10" fill="#f4ead0"/><circle cx="165" cy="19" r="8" fill="#232748"/><g fill="#ffd97a"><circle cx="28" cy="20" r="1.6"/><circle cx="60" cy="12" r="1.3"/><circle cx="96" cy="24" r="1.5"/><circle cx="130" cy="14" r="1.3"/><circle cx="146" cy="34" r="1.4"/></g><rect x="20" y="78" width="160" height="8" rx="2" fill="#6f5330"/><rect x="118" y="34" width="58" height="40" rx="6" fill="#14162b" stroke="#e8b64c" stroke-width="2.5"/><path d="M142 46 L142 62 L156 54 Z" fill="#e8b64c"/><rect x="34" y="52" width="52" height="10" rx="3" fill="#f4ead0" transform="rotate(-6 60 57)"/><rect x="38" y="64" width="44" height="10" rx="3" fill="#e3d3ab" transform="rotate(-6 60 69)"/><path d="M30 78 L46 44 L60 78 Z" fill="#9a6a3c" opacity=".25"/></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">B站「期末复习vlog」评论采集</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>哔哩哔哩</span><span class="num">剩余 2 / 8</span><span>10-15 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="LEGENDARY"></span><span class="rarity-caption">传说</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
         <article class="quest-card quest-card--board" data-tier="EPIC">
           <div class="cost-coin" role="img" aria-label="报酬 240 令"><b class="num">240</b><span>令</span></div>
-          <h3 class="quest-title">抖音「城市夜跑」话题数据表</h3>
-          <p class="quest-meta"><span>抖音</span><span class="num">剩余 12 / 30</span><span>10-12 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="EPIC"></span><span class="rarity-caption">史诗</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#2a2350"/><circle cx="44" cy="26" r="11" fill="#f4ead0" opacity=".9"/><g fill="#1d1836"><rect x="8" y="44" width="26" height="52"/><rect x="40" y="30" width="20" height="66"/><rect x="66" y="52" width="30" height="44"/><rect x="102" y="24" width="22" height="72"/><rect x="130" y="46" width="28" height="50"/><rect x="164" y="34" width="24" height="62"/></g><g fill="#cdb0f5" opacity=".7"><rect x="46" y="38" width="3" height="4"/><rect x="52" y="46" width="3" height="4"/><rect x="108" y="32" width="3" height="4"/><rect x="112" y="44" width="3" height="4"/><rect x="170" y="42" width="3" height="4"/><rect x="76" y="60" width="3" height="4"/></g><path d="M0 108 H200" stroke="#3a3060" stroke-width="6"/><g stroke="#e8b64c" stroke-width="3" fill="none" stroke-linecap="round"><circle cx="128" cy="66" r="5" fill="#e8b64c"/><path d="M128 71 L128 88 M128 88 L120 100 M128 88 L136 100 M128 76 L118 82 M128 76 L140 72"/></g><path d="M96 74 h16 M92 82 h14" stroke="#8d6cc0" stroke-width="2.5" stroke-linecap="round" opacity=".8"/></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">抖音「城市夜跑」话题数据表</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>抖音</span><span class="num">剩余 12 / 30</span><span>10-12 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="EPIC"></span><span class="rarity-caption">史诗</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
         <article class="quest-card quest-card--board" data-tier="NORMAL">
           <div class="cost-coin" role="img" aria-label="报酬 100 令"><b class="num">100</b><span>令</span></div>
-          <h3 class="quest-title">知乎「考研自习室」回答清单</h3>
-          <p class="quest-meta"><span>知乎</span><span class="num">剩余 24 / 60</span><span>10-08 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#efe3c6"/><rect x="128" y="20" width="48" height="40" rx="4" fill="#d9c69a" stroke="#8a7550" stroke-width="2.5"/><path d="M152 20 V60 M128 40 H176" stroke="#8a7550" stroke-width="2"/><rect x="24" y="72" width="66" height="12" rx="2" fill="#8a5a33"/><rect x="30" y="60" width="54" height="12" rx="2" fill="#a8791c"/><rect x="36" y="48" width="42" height="12" rx="2" fill="#5f4e33"/><rect x="24" y="84" width="152" height="8" rx="2" fill="#6f5330"/><rect x="112" y="62" width="14" height="20" rx="3" fill="#b0453a"/><path d="M112 66 h-6 a5 5 0 0 0 0 10 h6" fill="#b0453a"/><path d="M40 34 q0 -12 10 -12 h60" stroke="#8a7550" stroke-width="3" fill="none"/><circle cx="112" cy="24" r="6" fill="#e8b64c"/><path d="M112 30 v8" stroke="#8a7550" stroke-width="3"/></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">知乎「考研自习室」回答清单</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>知乎</span><span class="num">剩余 24 / 60</span><span>10-08 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
         <article class="quest-card quest-card--board" data-tier="RARE">
           <div class="cost-coin" role="img" aria-label="报酬 180 令"><b class="num">180</b><span>令</span></div>
-          <h3 class="quest-title">微博「校园歌手大赛」热议榜</h3>
-          <p class="quest-meta"><span>微博</span><span class="num">剩余 9 / 25</span><span>10-10 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#2b3a55"/><path d="M100 0 L58 120 H142 Z" fill="#4c7ba6" opacity=".35"/><rect x="0" y="102" width="200" height="18" fill="#1c2a3e"/><g transform="rotate(24 128 44)"><rect x="122" y="30" width="12" height="26" rx="6" fill="#c9c9d6"/><rect x="124" y="56" width="8" height="6" fill="#8a8a9a"/><path d="M128 62 V88" stroke="#c9c9d6" stroke-width="4"/><path d="M118 88 h20" stroke="#c9c9d6" stroke-width="4" stroke-linecap="round"/></g><g fill="none" stroke="#ffd97a" stroke-width="2.5"><path d="M64 52 v-16 l10 -3 v16"/><circle cx="61" cy="52" r="3.4"/><circle cx="71" cy="49" r="3.4"/><path d="M84 66 v-12 l8 -2 v12" stroke-width="2.2"/><circle cx="81.5" cy="66" r="3"/><circle cx="89.5" cy="64" r="3"/></g><circle cx="100" cy="10" r="3" fill="#fff" opacity=".8"/><circle cx="150" cy="16" r="2.4" fill="#fff" opacity=".6"/><circle cx="36" cy="14" r="2.2" fill="#fff" opacity=".5"/></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">微博「校园歌手大赛」热议榜</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>微博</span><span class="num">剩余 9 / 25</span><span>10-10 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="RARE"></span><span class="rarity-caption">稀有</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
         <article class="quest-card quest-card--board" data-tier="NORMAL">
           <div class="cost-coin" role="img" aria-label="报酬 100 令"><b class="num">100</b><span>令</span></div>
-          <h3 class="quest-title">豆瓣「秋日书单」标记数据</h3>
-          <p class="quest-meta"><span>豆瓣</span><span class="num">剩余 30 / 50</span><span>10-18 截止</span></p>
-          <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+          <div class="quest-art" aria-hidden="true"><i class="glow"></i>
+            <svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice"><rect width="200" height="120" fill="#f0e2c2"/><path d="M100 96 C 70 78 46 80 30 90 L30 46 C 46 36 70 38 100 56 C 130 38 154 36 170 46 L170 90 C 154 80 130 78 100 96 Z" fill="#8a7550"/><path d="M100 90 C 74 74 52 76 38 84 L38 52 C 52 44 74 46 100 62 C 126 46 148 44 162 52 L162 84 C 148 76 126 74 100 90 Z" fill="#fbf5e7"/><path d="M100 62 V90" stroke="#c9b98f" stroke-width="2"/><g stroke="#c9b98f" stroke-width="1.6"><path d="M48 60 h38 M48 66 h34 M114 60 h38 M114 66 h34"/></g><g fill="#c98a2c"><path d="M36 24 q6 4 4 10 q-8 0 -8 -6 q0 -3 4 -4" opacity=".85"/><path d="M158 18 q7 3 6 10 q-9 1 -9 -5 q0 -3 3 -5" opacity=".7"/><path d="M84 14 q6 3 5 9 q-8 1 -9 -4 q0 -3 4 -5" opacity=".6"/></g></svg>
+          </div>
+          <div class="quest-banner"><h3 class="quest-title">豆瓣「秋日书单」标记数据</h3></div>
+          <div class="quest-body">
+            <p class="quest-meta"><span>豆瓣</span><span class="num">剩余 30 / 50</span><span>10-18 截止</span></p>
+            <div class="quest-foot"><span class="gem-badge" data-gem="NORMAL"></span><span class="rarity-caption">普通</span></div>
+          </div>
           <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
         </article>
       </div></div>
@@ -886,7 +976,7 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
 <!-- ═══════ 卷轴弹窗 ═══════ -->
 <section class="demo-sec" id="dialogs">
   <h2>羊皮纸弹窗（§0.4：顶部纸卷 + 纸身自上而下展开）</h2>
-  <p class="sec-sub">下方为静态外观（顶部卷纸螺旋断面、纸面纹理、底缘卷边阴影与火漆印）；点各页面的「接取委托 / 申请兑换 / 举报」可体验真实模态的自上而下展开。点击下方的收起卷轴可看展开过程。</p>
+  <p class="sec-sub">下方为静态外观（顶部卷纸螺旋断面、雕线内框、黄铜包角、底缘卷边阴影、纸脚火漆印与金屑粒子）；点各页面的「接取委托 / 申请兑换 / 举报」可体验真实模态的 3D 翻开 + 自上而下展开。点击下方的收起卷轴可看展开过程。</p>
   <div class="row"><button class="scroll-rolled" type="button" id="rolledDemo"><span class="roll-end" aria-hidden="true"></span>展开这卷收起的卷轴</button></div>
   <div class="demo-stage">
     <dialog class="scrollx" open aria-labelledby="d1t">
@@ -933,10 +1023,10 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
   <ol class="guide-list">
     <li><b>主页 hero：</b>烛尘粒子漂浮、标题入柱、按钮火漆按压（按下下压回弹 + 印环绽开）、磁吸 CTA（指针靠近时轻微跟随）。</li>
     <li><b>旅程地图：</b>滚动到地图区域，路径随滚动 scrub 描绘，五步依次浮现。</li>
-    <li><b>发现委托：</b>四档难度 = 宝石徽记（圆珠/圆宝石/六棱/钻石）+ 颜色遮罩 + 炉石式金属边框（分层倒角/铆钉/花角/顶嵌宝石）+ 右上点数硬币；悬停看稀有以上的一次性光泽扫过；普通档保持安静。</li>
+    <li><b>发现委托：</b>炉石式三区卡片——上方委托场景插画、名称绶带、下方文字区；四档难度 = 宝石徽记 + 颜色遮罩 + 厚金属边框（铆钉/花角/顶嵌宝石）+ 左上点数硬币 + 卡内档位粒子；鼠标悬停有 3D 倾斜与眩光跟随（普通档安静无粒子）。</li>
     <li><b>委托板：</b>拖拽任意卡片重摆（松手弹性落座）；拖火漆印到委托函盖印（印痕 + 金屑 + 吐司）。</li>
     <li><b>委托详情：</b>领取事实面板（中性纸面）、五步进度条、上传进度、鉴定报告（错误优先）、弃单按钮→卷轴弹窗。</li>
-    <li><b>羊皮纸弹窗：</b>点「接取委托 / 举报 / 放弃」看纸身从上到下逐渐卷开的模态动画（顶部纸卷 + 纸脚火漆印）；Escape 或点击背板关闭。</li>
+    <li><b>羊皮纸弹窗：</b>点「接取委托 / 举报 / 放弃」看 3D 翻开 + 纸身自上而下展开（雕线内框、黄铜包角、纸脚火漆印、金屑上浮）；打开后移动鼠标有 3D 视差；Escape 或点击背板关闭。</li>
     <li><b>键盘可达：</b>Tab 遍历（金色 focus 环）、Enter 触发、弹窗焦点圈；系统「减弱动态效果」开启时全站自动静态。</li>
     <li><b>窄屏（&lt;640px）：</b>侧栏收起为底部五格导航；拖拽与盖印在触屏可用（touch-action 已处理）。</li>
   </ol>
@@ -1031,15 +1121,33 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
   }
   document.querySelectorAll("[data-gem]").forEach(function (el) { el.innerHTML = gemSVG(el.getAttribute("data-gem")); });
 
-  /* ---------- 卡片装配：颜色遮罩/光泽裁剪层 + 四角铆钉 + 花角 + 顶嵌宝石 ---------- */
+  /* ---------- 卡片装配：遮罩/眩光/光泽裁剪层 + 铆钉 + 花角 + 顶嵌宝石 + 档位粒子 ---------- */
+  function injectSparks(container, n) {
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement("i");
+      s.style.left = (6 + Math.random() * 86) + "%";
+      s.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
+      s.style.animationDuration = (3.2 + Math.random() * 2.2).toFixed(2) + "s";
+      container.appendChild(s);
+    }
+  }
+  var SPARK_COLORS = { RARE: "#9cc4e8", EPIC: "#cdb0f5", LEGENDARY: "#ffd97a" };
   document.querySelectorAll(".quest-card[data-tier]").forEach(function (card) {
     var clip = document.createElement("i");
     clip.className = "card-clip"; clip.setAttribute("aria-hidden", "true");
-    clip.innerHTML = '<i class="tint"></i><i class="sheen"></i>';
+    clip.innerHTML = '<i class="tint"></i><i class="glare"></i><i class="sheen"></i>';
     card.insertBefore(clip, card.firstChild);
     ["tl", "tr", "bl", "br"].forEach(function (p) {
       var s = document.createElement("i"); s.className = "stud " + p; s.setAttribute("aria-hidden", "true"); card.appendChild(s);
     });
+    var tier = card.getAttribute("data-tier");
+    if (tier !== "NORMAL") {
+      var sp = document.createElement("i");
+      sp.className = "card-sparkles"; sp.setAttribute("aria-hidden", "true");
+      sp.style.setProperty("--spark", SPARK_COLORS[tier] || "#ffd97a");
+      injectSparks(sp, 7);
+      card.appendChild(sp);
+    }
   });
   document.querySelectorAll('.quest-card[data-tier="EPIC"], .quest-card[data-tier="LEGENDARY"]').forEach(function (card) {
     ["tl", "tr", "bl", "br"].forEach(function (p) {
@@ -1049,11 +1157,53 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
   document.querySelectorAll('.quest-card[data-tier="LEGENDARY"]').forEach(function (card) {
     var g = document.createElement("i"); g.className = "frame-gem"; g.setAttribute("aria-hidden", "true"); g.innerHTML = gemSVG("LEGENDARY"); card.appendChild(g);
   });
-  /* 纸脚火漆印（所有羊皮纸弹窗） */
+  /* 卡片 3D 倾斜（鼠标跟随）+ 眩光定位 */
+  if (hasGsap) {
+    document.querySelectorAll(".quest-card[data-tier]").forEach(function (card) {
+      if (card.dataset.tiltBound) return; card.dataset.tiltBound = "1";
+      gsap.set(card, { transformPerspective: 750 });
+      var rx = gsap.quickTo(card, "rotationX", { duration: .4, ease: "power2" });
+      var ry = gsap.quickTo(card, "rotationY", { duration: .4, ease: "power2" });
+      card.addEventListener("pointermove", function (e) {
+        if (!motionOn) return;
+        var r = card.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        ry((px - .5) * 11); rx(-(py - .5) * 11);
+        card.style.setProperty("--gx", (px * 100).toFixed(1) + "%");
+        card.style.setProperty("--gy", (py * 100).toFixed(1) + "%");
+      });
+      card.addEventListener("pointerleave", function () { rx(0); ry(0); });
+    });
+  }
+  /* 纸脚火漆印 + 金属包角 + 金屑粒子（所有羊皮纸弹窗） */
   document.querySelectorAll(".scroll-paper").forEach(function (p) {
-    if (p.querySelector(".parch-seal")) return;
-    var s = document.createElement("span"); s.className = "parch-seal"; s.textContent = "令"; s.setAttribute("aria-hidden", "true"); p.appendChild(s);
+    if (!p.querySelector(".parch-seal")) {
+      var seal = document.createElement("span"); seal.className = "parch-seal"; seal.textContent = "令"; seal.setAttribute("aria-hidden", "true"); p.appendChild(seal);
+    }
+    ["tl", "tr", "bl", "br"].forEach(function (c) {
+      var k = document.createElement("i"); k.className = "parch-corner " + c; k.setAttribute("aria-hidden", "true"); p.appendChild(k);
+    });
+    var sp = document.createElement("i"); sp.className = "parch-sparks"; sp.setAttribute("aria-hidden", "true");
+    injectSparks(sp, 9);
+    p.appendChild(sp);
   });
+  /* 弹窗 3D：悬停视差（翻开动画见 data-open 处理器） */
+  if (hasGsap) {
+    document.querySelectorAll("dialog.scrollx").forEach(function (dlg) {
+      if (dlg.dataset.tiltBound) return; dlg.dataset.tiltBound = "1";
+      gsap.set(dlg, { transformPerspective: 950, transformOrigin: "50% 0%" });
+      var rx = gsap.quickTo(dlg, "rotationX", { duration: .45, ease: "power2" });
+      var ry = gsap.quickTo(dlg, "rotationY", { duration: .45, ease: "power2" });
+      dlg.addEventListener("pointermove", function (e) {
+        if (!motionOn || !dlg.open) return;
+        var r = dlg.getBoundingClientRect();
+        ry(((e.clientX - r.left) / r.width - .5) * 7);
+        rx(-((e.clientY - r.top) / r.height - .5) * 7);
+      });
+      dlg.addEventListener("pointerleave", function () { rx(0); ry(0); });
+      dlg.addEventListener("close", function () { rx(0); ry(0); });
+    });
+  }
 
   /* ---------- 主题粒子（烛尘） ---------- */
   (function () {
@@ -1088,10 +1238,11 @@ footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: 
       if (!dlg) return;
       dlg.showModal();
       if (hasGsap && motionOn) {
+        gsap.fromTo(dlg, { rotationX: -15, y: -26, opacity: .5, transformOrigin: "50% 0%", transformPerspective: 950 }, { rotationX: 0, y: 0, opacity: 1, duration: .5, ease: "back.out(1.35)" });
         var paper = dlg.querySelector(".scroll-paper");
         var roll = dlg.querySelector(".roll-top");
-        if (roll) gsap.from(roll, { y: -14, opacity: 0, duration: .35, ease: "power2.out" });
-        if (paper) gsap.fromTo(paper, { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: .55, ease: "power2.out" });
+        if (roll) gsap.from(roll, { y: -14, opacity: 0, duration: .35, ease: "power2.out" }, .05);
+        if (paper) gsap.fromTo(paper, { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: .55, ease: "power2.out" }, .08);
       }
     });
   });
