@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="parchment">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>华师令 Campus Request · 风格方案预览（酒馆派遣 × 学院风）</title>
+<!--
+  华师令 Campus Request — 三套「冒险酒馆 × 学院」风格方案 + GSAP 动效预览
+  方案A 羊皮卷与火漆 / 方案B 星夜学院 / 方案C 学院活力 —— 右上角切换主题
+  动效：GSAP 3 (CDN) + ScrollTrigger + Draggable；prefers-reduced-motion 与「动效开关」均回到完整静态页
+  规范依据：.claude/skills/gsap-*（registerPlugin / matchMedia / 插件注册）与 motion-web SKILL.md
+  （静帧设计优先、组件状态矩阵、reduced-motion 不得有元素卡在隐藏态、无未定义 CSS 变量）
+  复制建议（文案含虚构数据）：本页为提案演示，非运行时产物
+-->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Draggable.min.js"></script>
+<style>
+/* ============================================================
+   0. 主题 token —— 三套方案各一组完整变量（无未定义引用）
+   ============================================================ */
+:root {
+  --font-display: Georgia, "Times New Roman", "STZhongsong", "SimSun", "Songti SC", serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --control: 2.75rem;
+  --sp-1: .25rem; --sp-2: .5rem; --sp-3: .75rem; --sp-4: 1rem; --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem;
+  --dur-fast: 150ms; --dur-slow: 200ms;
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+}
+
+/* ── 方案A 羊皮卷与火漆 Parchment Tavern（浅暖 · 适合长时间浏览） ── */
+html[data-theme="parchment"] {
+  --bg: #f2e9d5; --panel: #faf3e3; --panel-2: #ece0c4; --overlay: #f7f0df;
+  --ink: #33291c; --muted: #6f6350; --subtle: #8c7f69; --inverse: #fdf6e9;
+  --border: #d9c9a6; --border-strong: #b9a377; --focus: #2f5d8a;
+  --primary: #9c2b23; --primary-strong: #7e211b; --on-primary: #fdf6e9;
+  --gold: #a8791c; --success: #4a7c3f; --success-muted: #e4ecd7;
+  --warning: #a8791c; --warning-muted: #f2e8cf; --danger: #a3271e; --danger-muted: #f3dcd6;
+  --info: #2f5d8a; --info-muted: #dde8ef;
+  --rarity-normal: #5b5648; --rarity-rare: #2f5d8a; --rarity-epic: #6d4a9e; --rarity-legendary: #a8791c;
+  --radius-sm: .5rem; --radius-md: .875rem; --radius-lg: 1.375rem;
+  --shadow-1: 0 1px 2px rgba(51,41,28,.08), 0 2px 8px rgba(51,41,28,.06);
+  --shadow-2: 0 2px 4px rgba(51,41,28,.10), 0 10px 24px rgba(51,41,28,.14);
+  --board-bg: linear-gradient(#dcbf93, #d0b183);
+  --board-frame: #7a5230;
+  --hero-wash: linear-gradient(135deg, #f2e9d5 55%, #ecdcb8);
+  --seal-wax: radial-gradient(circle at 32% 30%, #c04a3a, #8c231c 68%);
+  --scrim: rgba(38,30,18,.42);
+}
+/* ── 方案B 星夜学院 Academy Night（深色 · 霍格沃兹夜巡） ── */
+html[data-theme="night"] {
+  --bg: #14162b; --panel: #1d2038; --panel-2: #252a49; --overlay: #1a1d33;
+  --ink: #e9e7f7; --muted: #a5a3c4; --subtle: #8a87ad; --inverse: #14162b;
+  --border: #343959; --border-strong: #4a5080; --focus: #e8b64c;
+  --primary: #d9a441; --primary-strong: #c08f2e; --on-primary: #241b04;
+  --gold: #e8b64c; --success: #5fbf7a; --success-muted: #1d3327;
+  --warning: #d9a441; --warning-muted: #39311c; --danger: #e0655f; --danger-muted: #3c2020;
+  --info: #7d9cf0; --info-muted: #1e2947;
+  --rarity-normal: #a8b0c8; --rarity-rare: #5b8def; --rarity-epic: #9d7bf0; --rarity-legendary: #e8b64c;
+  --radius-sm: .5rem; --radius-md: .875rem; --radius-lg: 1.375rem;
+  --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 10px rgba(0,0,0,.35);
+  --shadow-2: 0 4px 12px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+  --board-bg: linear-gradient(#232748, #1b1e3a);
+  --board-frame: #3a4070;
+  --hero-wash: radial-gradient(1200px 500px at 70% -10%, #2b3060 0%, #14162b 60%);
+  --seal-wax: radial-gradient(circle at 32% 30%, #f0c26a, #b8842c 68%);
+  --scrim: rgba(6,8,18,.6);
+}
+/* ── 方案C 学院活力 Vivid Academy（浅冷 · 最接近落地） ── */
+html[data-theme="vivid"] {
+  --bg: #f4f6ff; --panel: #ffffff; --panel-2: #eef1fe; --overlay: #f7f8ff;
+  --ink: #1d2440; --muted: #5a628a; --subtle: #7c84ad; --inverse: #ffffff;
+  --border: #dfe3f5; --border-strong: #c3c9ec; --focus: #4f46e5;
+  --primary: #4f46e5; --primary-strong: #4038d8; --on-primary: #ffffff;
+  --gold: #f59e0b; --success: #14b892; --success-muted: #dcf5ee;
+  --warning: #f59e0b; --warning-muted: #fdf0d7; --danger: #e5484d; --danger-muted: #fce4e4;
+  --info: #2f6fed; --info-muted: #e0ebfd;
+  --rarity-normal: #64748b; --rarity-rare: #2f6fed; --rarity-epic: #8b5cf6; --rarity-legendary: #f59e0b;
+  --radius-sm: .625rem; --radius-md: 1rem; --radius-lg: 1.5rem;
+  --shadow-1: 0 1px 2px rgba(29,36,64,.06), 0 4px 14px rgba(79,70,229,.08);
+  --shadow-2: 0 4px 10px rgba(29,36,64,.08), 0 18px 40px rgba(79,70,229,.16);
+  --board-bg: linear-gradient(#e9edff, #dfe5fd);
+  --board-frame: #4f46e5;
+  --hero-wash: linear-gradient(140deg, #f4f6ff 45%, #e5e1ff 78%, #ffe9e6);
+  --seal-wax: radial-gradient(circle at 32% 30%, #7a72f2, #4038d8 68%);
+  --scrim: rgba(20,26,52,.42);
+}
+
+/* ============================================================
+   1. 基础
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.65;
+  color: var(--ink); background: var(--bg);
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3 { line-height: 1.25; }
+.num { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+.motion-off *, .motion-off *::before, .motion-off *::after { transition: none !important; }
+.motion-off .particles { display: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ============================================================
+   2. 顶栏（演示导航）
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+.topbar-brand { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--font-display); font-weight: 700; letter-spacing: .02em; }
+.topbar-brand img { width: 1.75rem; height: 1.75rem; }
+.theme-switch { display: flex; gap: var(--sp-1); margin-left: auto; flex-wrap: wrap; }
+.theme-btn {
+  min-height: 2.25rem; padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--border-strong); border-radius: 999px;
+  background: var(--panel); color: var(--muted); font: inherit; font-size: .8125rem; font-weight: 550; cursor: pointer;
+}
+.theme-btn[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.topbar nav { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.topbar nav a { color: var(--muted); font-size: .8125rem; text-decoration: none; padding: var(--sp-1) var(--sp-2); border-radius: var(--radius-sm); }
+.topbar nav a:hover { background: var(--panel-2); color: var(--ink); }
+
+/* ============================================================
+   3. Landing
+   ============================================================ */
+.hero {
+  position: relative; overflow: hidden;
+  padding: var(--sp-7) var(--sp-5) var(--sp-7);
+  background: var(--hero-wash);
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner {
+  max-width: 72rem; margin-inline: auto;
+  display: grid; gap: var(--sp-6); align-items: center;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+}
+@media (max-width: 56rem) { .hero-inner { grid-template-columns: 1fr; } }
+.hero-eyebrow {
+  margin: 0 0 var(--sp-2);
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  font-size: .8125rem; font-weight: 600; letter-spacing: .12em; color: var(--primary);
+}
+.hero-eyebrow::before { content: ""; width: 1.5rem; height: 2px; background: var(--primary); }
+.hero h1 {
+  margin: 0; font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4rem); /* display ÷ body = 4× */
+  font-weight: 700; letter-spacing: .01em; line-height: 1.12;
+}
+.hero h1 .latin { display: block; font-size: .42em; letter-spacing: .22em; color: var(--muted); margin-top: var(--sp-2); text-transform: uppercase; }
+.hero-tagline { margin: var(--sp-4) 0 0; font-size: clamp(1.0625rem, 2vw, 1.25rem); color: var(--muted); max-width: 34rem; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-5); }
+.hero-note { margin: var(--sp-3) 0 0; font-size: .8125rem; color: var(--subtle); }
+
+/* 徽记：左 PNG 原徽 / 右 SVG 重绘描边版 */
+.hero-visual { position: relative; display: grid; place-items: center; min-height: 22rem; }
+.crest-png { width: clamp(7rem, 12vw, 9.5rem); filter: drop-shadow(0 6px 16px rgba(0,0,0,.15)); mix-blend-mode: multiply; }
+html[data-theme="night"] .crest-png {
+  mix-blend-mode: normal; background: var(--panel); padding: .75rem;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-2), 0 0 0 1px var(--border-strong);
+}
+.crest { position: absolute; width: clamp(13rem, 22vw, 19rem); opacity: .5; pointer-events: none; }
+.crest .draw { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.crest path, .crest line { fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.crest .soft { stroke: var(--border-strong); stroke-width: 1.5; }
+
+/* 卡片扇（hero 右下） */
+.card-fan { position: absolute; bottom: -1rem; right: 0; width: min(20rem, 90%); height: 13rem; }
+.fan-card {
+  position: absolute; bottom: 0; left: 50%; width: 11rem;
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2); padding: var(--sp-3);
+}
+.fan-card:nth-child(1) { transform: translateX(-50%) translateX(-5.6rem) rotate(-9deg); }
+.fan-card:nth-child(2) { transform: translateX(-50%) translateY(-.8rem); z-index: 2; }
+.fan-card:nth-child(3) { transform: translateX(-50%) translateX(5.6rem) rotate(9deg); }
+.fan-title { margin: 0; font-size: .8125rem; font-weight: 650; line-height: 1.45; }
+.fan-meta { margin: var(--sp-1) 0 0; display: flex; justify-content: space-between; align-items: center; font-size: .75rem; color: var(--muted); }
+.fan-reward { font-weight: 650; color: var(--primary); }
+
+/* 主题粒子：A 烛尘 B 星屑 C 花瓣纸屑 */
+.particles { position: absolute; inset: 0; pointer-events: none; }
+.particles span { position: absolute; width: 6px; height: 6px; border-radius: 50%; opacity: .5; }
+html[data-theme="parchment"] .particles span { background: #c98a2c; }
+html[data-theme="night"] .particles span { background: #fff; box-shadow: 0 0 8px rgba(255,255,255,.8); }
+html[data-theme="vivid"] .particles span:nth-child(3n) { background: #ff8a7e; }
+html[data-theme="vivid"] .particles span:nth-child(3n+1) { background: #35d0ab; }
+html[data-theme="vivid"] .particles span:nth-child(3n+2) { background: #8b5cf6; }
+
+/* 统计带 */
+.stats-band { border-bottom: 1px solid var(--border); background: var(--panel); }
+.stats-inner { max-width: 72rem; margin-inline: auto; padding: var(--sp-5); display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-7); justify-content: space-between; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.75rem; color: var(--primary); }
+.stat span { font-size: .8125rem; color: var(--muted); }
+
+/* 委托旅程（SVG 路径 scrub 描绘） */
+.journey { max-width: 72rem; margin-inline: auto; padding: var(--sp-7) var(--sp-5); }
+.journey h2, .board-sec h2, .comp-sec h2, .dlg-sec h2, .token-sec h2 { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 var(--sp-2); }
+.sec-sub { margin: 0 0 var(--sp-5); color: var(--muted); max-width: 42rem; }
+.journey-map { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-3); }
+.journey-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.journey-svg path { fill: none; stroke: var(--primary); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; opacity: .35; }
+.journey-step { position: relative; text-align: center; padding-top: var(--sp-4); }
+.journey-dot {
+  width: 2.75rem; height: 2.75rem; margin: 0 auto var(--sp-2);
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 700;
+  background: var(--panel); border: 2px solid var(--primary); border-radius: 50%; color: var(--primary);
+  box-shadow: var(--shadow-1);
+}
+.journey-step b { display: block; font-size: .9375rem; }
+.journey-step span { font-size: .75rem; color: var(--muted); }
+@media (max-width: 40rem) { .journey-map { grid-template-columns: 1fr; } .journey-svg { display: none; } .journey-step { display: grid; grid-template-columns: 3rem 1fr; text-align: left; gap: var(--sp-3); align-items: center; } }
+
+/* ============================================================
+   4. 委托板（可拖拽）+ 盖印台
+   ============================================================ */
+.board-sec { padding: var(--sp-7) var(--sp-5); border-block: 1px solid var(--border); background: var(--panel); }
+.board-wrap { max-width: 72rem; margin-inline: auto; display: grid; gap: var(--sp-5); }
+.stamp-bay-row { display: grid; gap: var(--sp-4); grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; }
+@media (max-width: 48rem) { .stamp-bay-row { grid-template-columns: 1fr; } }
+.seal-letter {
+  position: relative; min-height: 9.5rem; padding: var(--sp-4);
+  background: var(--overlay); border: 1.5px dashed var(--border-strong); border-radius: var(--radius-md);
+  display: grid; place-items: center; text-align: center; color: var(--muted); font-size: .875rem;
+}
+.seal-imprint {
+  position: absolute; right: var(--sp-4); bottom: var(--sp-3);
+  width: 3.25rem; height: 3.25rem; display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--on-primary);
+  background: var(--seal-wax); border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,.25), 0 2px 6px rgba(0,0,0,.3);
+  transform: rotate(-8deg); pointer-events: none;
+}
+.seal-imprint::after { content: "Campus Request"; position: absolute; bottom: .3rem; font-size: .375rem; letter-spacing: .12em; opacity: .85; }
+.seal-stamp {
+  width: 5.25rem; height: 5.25rem; border-radius: 50%;
+  display: grid; place-items: center; cursor: grab;
+  font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--on-primary);
+  background: var(--seal-wax);
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,.28), 0 10px 22px rgba(0,0,0,.35);
+  border: 3px solid var(--panel);
+  user-select: none; touch-action: none;
+}
+.seal-stamp:active { cursor: grabbing; }
+.stamp-hint { align-self: center; font-size: .8125rem; color: var(--muted); max-width: 14rem; text-align: center; }
+.board-outer {
+  background: var(--board-bg); border: 10px solid var(--board-frame); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2);
+  padding: var(--sp-4);
+}
+.board-inner { position: relative; min-height: 27rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--sp-4); align-items: start; }
+.quest-card {
+  position: relative; background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  box-shadow: var(--shadow-1); cursor: grab; touch-action: none;
+}
+.quest-card:active { cursor: grabbing; }
+.quest-card::before {
+  content: ""; position: absolute; top: -.45rem; left: 50%; translate: -50% 0;
+  width: .9rem; height: .9rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--rarity-legendary), #7c5a10 75%);
+  box-shadow: 0 2px 4px rgba(0,0,0,.35); border: 2px solid var(--panel);
+}
+.quest-head { display: flex; justify-content: space-between; align-items: start; gap: var(--sp-2); }
+.quest-title { margin: 0; font-size: .9375rem; font-weight: 650; line-height: 1.45; }
+.quest-reward { font-weight: 700; color: var(--primary); white-space: nowrap; }
+.quest-meta { margin: var(--sp-2) 0 0; display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-3); font-size: .75rem; color: var(--muted); }
+.quest-actions { display: flex; justify-content: flex-end; margin-top: var(--sp-3); }
+/* 火漆稀有度徽章：印章造型，颜色沿用稀有度 token */
+.seal-badge {
+  display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%;
+  font-family: var(--font-display); font-size: .8rem; font-weight: 700; color: var(--on-primary);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.3), 0 1px 3px rgba(0,0,0,.25);
+}
+.seal-badge[data-rarity="NORMAL"] { background: var(--rarity-normal); }
+.seal-badge[data-rarity="RARE"] { background: var(--rarity-rare); }
+.seal-badge[data-rarity="EPIC"] { background: var(--rarity-epic); }
+.seal-badge[data-rarity="LEGENDARY"] { background: var(--rarity-legendary); }
+.rarity-label { font-size: .75rem; color: var(--muted); font-weight: 550; }
+
+/* ============================================================
+   5. 组件区（按钮 / 徽章 / 表单 / 告警 / 进度 / 排行 / 通知 / 状态）
+   ============================================================ */
+.comp-sec { max-width: 72rem; margin-inline: auto; padding: var(--sp-7) var(--sp-5); }
+.comp-grid { display: grid; gap: var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); align-items: start; }
+.comp-block { display: grid; gap: var(--sp-3); }
+.comp-block > h3 { margin: 0; font-size: .9375rem; font-weight: 650; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-4); box-shadow: var(--shadow-1); }
+
+/* 按钮：火漆主按钮（盖章按压）+ 卷轴次按钮 + 磁吸 CTA + 涟漪 */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: var(--control); padding: var(--sp-2) var(--sp-4);
+  font: inherit; font-weight: 600; border: 1px solid transparent; border-radius: var(--radius-md);
+  cursor: pointer; text-decoration: none; position: relative; overflow: visible;
+}
+.btn:disabled { cursor: not-allowed; opacity: .6; }
+.btn-seal { background: var(--primary); color: var(--on-primary); box-shadow: 0 2px 0 var(--primary-strong), 0 6px 14px rgba(0,0,0,.18); }
+.btn-seal:hover:not(:disabled) { filter: brightness(1.05); }
+.btn-scroll { background: var(--panel); color: var(--ink); border-color: var(--border-strong); }
+.btn-scroll:hover:not(:disabled) { background: var(--panel-2); }
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover:not(:disabled) { background: var(--panel-2); color: var(--ink); }
+.btn-danger { background: var(--danger); color: var(--inverse); }
+.btn-block { width: 100%; }
+.stamp-ring {
+  position: absolute; inset: 0; margin: auto; width: 100%; height: 100%;
+  border: 2px solid var(--primary); border-radius: inherit; pointer-events: none; opacity: 0;
+}
+.ripple {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  background: color-mix(in srgb, var(--primary) 35%, transparent);
+  transform: scale(0); width: 8px; height: 8px;
+}
+
+/* 徽章与告警 */
+.badge { display: inline-flex; align-items: center; gap: var(--sp-1); padding: .125rem var(--sp-2); font-size: .75rem; font-weight: 600; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); background: var(--panel); white-space: nowrap; }
+.badge-info { color: var(--info); border-color: color-mix(in srgb, var(--info) 35%, var(--border)); background: var(--info-muted); }
+.badge-success { color: var(--success); border-color: color-mix(in srgb, var(--success) 35%, var(--border)); background: var(--success-muted); }
+.badge-warning { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 40%, var(--border)); background: var(--warning-muted); }
+.badge-danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--border)); background: var(--danger-muted); }
+.badge-muted { background: var(--panel-2); color: var(--muted); }
+.alert { display: grid; gap: var(--sp-1); padding: var(--sp-3); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: .9375rem; }
+.alert p { margin: 0; }
+.alert-error { background: var(--danger-muted); border-color: var(--danger); }
+.alert-success { background: var(--success-muted); border-color: var(--success); }
+.alert-warning { background: var(--warning-muted); border-color: var(--warning); }
+.alert .mark { font-weight: 800; margin-right: var(--sp-1); }
+.alert-error .mark { color: var(--danger); }
+.alert-success .mark { color: var(--success); }
+.alert-warning .mark { color: var(--warning); }
+
+/* 表单 */
+.field { display: grid; gap: var(--sp-1); }
+.field label { font-size: .875rem; font-weight: 600; }
+.input {
+  width: 100%; min-height: var(--control); padding: var(--sp-2) var(--sp-3);
+  font: inherit; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+}
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.field-err { margin: 0; font-size: .75rem; font-weight: 550; color: var(--danger); }
+.hint { margin: 0; font-size: .75rem; color: var(--muted); }
+
+/* 旅程进度条（组件版） */
+.steps { display: flex; align-items: center; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
+.step { display: inline-flex; align-items: center; gap: var(--sp-1); }
+.step::before { content: ""; width: var(--sp-4); height: 2px; margin-right: var(--sp-1); background: var(--border); }
+.step:first-child::before { display: none; }
+.step[data-state="done"]::before, .step[data-state="current"]::before { background: color-mix(in srgb, var(--primary) 50%, var(--border)); }
+.step-dot { width: .7rem; height: .7rem; border-radius: 50%; border: 2px solid var(--border-strong); background: var(--panel); }
+.step[data-state="done"] .step-dot { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 40%, var(--panel)); }
+.step[data-state="current"] .step-dot { border-color: var(--primary); background: var(--primary); }
+.step-label { font-size: .75rem; color: var(--subtle); white-space: nowrap; }
+.step[data-state="current"] .step-label { color: var(--primary); font-weight: 650; }
+
+/* 荣誉殿堂（排行榜）：前三领奖台 */
+.podium { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); align-items: end; margin-bottom: var(--sp-4); }
+.podium-slot { display: grid; justify-items: center; gap: var(--sp-1); }
+.podium-bar { width: 100%; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--panel-2); border: 1px solid var(--border); display: grid; place-items: center; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+.podium-slot:nth-child(1) .podium-bar { height: 2.25rem; }
+.podium-slot:nth-child(2) .podium-bar { height: 3.25rem; background: color-mix(in srgb, var(--gold) 22%, var(--panel-2)); }
+.podium-slot:nth-child(3) .podium-bar { height: 1.5rem; }
+.board-rows { display: grid; gap: var(--sp-1); margin: 0; padding: 0; list-style: none; }
+.board-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: baseline; gap: var(--sp-2); padding: var(--sp-2) var(--sp-3); border: 1px solid transparent; border-radius: var(--radius-sm); }
+.board-row[data-me="true"] { border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); background: color-mix(in srgb, var(--primary) 8%, var(--panel)); }
+.board-nick { min-width: 0; overflow-wrap: anywhere; }
+
+/* 信使通知 */
+.notif-list { display: grid; gap: var(--sp-2); margin: 0; padding: 0; list-style: none; }
+.notif-item { display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3); padding: var(--sp-3); background: var(--panel); border: 1px solid var(--border-strong); border-radius: var(--radius-md); }
+.notif-item[data-read="true"] { border-color: var(--border); background: color-mix(in srgb, var(--panel) 55%, var(--bg)); }
+.notif-ico { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: var(--radius-sm); background: var(--panel-2); }
+.notif-main { display: grid; gap: 2px; min-width: 0; }
+.notif-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-1) var(--sp-2); }
+.notif-type { font-size: .75rem; font-weight: 650; color: var(--muted); }
+.notif-time { margin-left: auto; font-size: .75rem; color: var(--subtle); }
+.notif-title { margin: 0; font-weight: 600; font-size: .9375rem; overflow-wrap: anywhere; }
+.notif-item[data-read="true"] .notif-title { font-weight: 400; }
+.notif-body { margin: 0; font-size: .8125rem; color: var(--muted); }
+
+/* 骨架 / 空态 */
+.skeleton-line { height: .875rem; border-radius: var(--radius-sm); background: var(--panel-2); animation: shimmer 1.4s ease-in-out infinite; }
+@keyframes shimmer { 50% { opacity: .55; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { display: grid; justify-items: center; gap: var(--sp-1); padding: var(--sp-6); border: 1.5px dashed var(--border-strong); border-radius: var(--radius-md); text-align: center; }
+.empty h3 { margin: 0; font-size: 1rem; }
+.empty p { margin: 0; font-size: .8125rem; color: var(--muted); }
+.empty .glyph { font-size: 1.75rem; }
+
+/* 评论区（羊皮卷） */
+.comment-thread { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--panel); padding: var(--sp-3); display: grid; gap: var(--sp-2); }
+.comment-meta { display: flex; flex-wrap: wrap; gap: var(--sp-2); font-size: .75rem; color: var(--muted); align-items: baseline; }
+.comment-author { font-weight: 650; color: var(--ink); }
+.comment-content { margin: 0; font-size: .9375rem; }
+.comment-actions { display: flex; gap: var(--sp-1); flex-wrap: wrap; }
+.chip-btn { min-height: 2rem; padding: var(--sp-1) var(--sp-2); font-size: .75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--panel); color: var(--muted); cursor: pointer; }
+.chip-btn[aria-pressed="true"] { border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); background: color-mix(in srgb, var(--primary) 8%, var(--panel)); color: var(--primary); }
+
+/* 星级 */
+.stars { display: flex; gap: var(--sp-1); font-size: 1.5rem; line-height: 1; }
+.star { color: var(--border-strong); cursor: pointer; background: none; border: none; font-size: inherit; padding: .2rem; }
+.star[aria-pressed="true"], .star.on { color: var(--gold); }
+
+/* ============================================================
+   6. 弹窗（羊皮卷展开入场）+ 吐司
+   ============================================================ */
+.dlg-sec { max-width: 72rem; margin-inline: auto; padding: var(--sp-7) var(--sp-5); }
+.dlg-stage { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); justify-items: center; }
+.dlg-stage .demo-stage { padding: var(--sp-4); background: var(--scrim); border-radius: var(--radius-md); display: grid; justify-items: center; width: 100%; }
+dialog.dialog {
+  width: min(26rem, calc(100vw - 2 * var(--sp-4)));
+  padding: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-2); color: var(--ink); background: var(--panel);
+}
+dialog.dialog::backdrop { background: var(--scrim); }
+.dialog-body { display: grid; gap: var(--sp-3); padding: var(--sp-5) var(--sp-4) var(--sp-4); }
+.dialog-title { margin: 0; font-family: var(--font-display); font-size: 1.25rem; }
+.dialog-actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.dialog-actions .btn { flex: 1 1 auto; }
+.toast-zone { position: fixed; right: var(--sp-4); bottom: var(--sp-4); z-index: 80; display: grid; gap: var(--sp-2); justify-items: end; }
+.toast {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4); background: var(--ink); color: var(--bg);
+  border-radius: 999px; box-shadow: var(--shadow-2); font-size: .875rem; font-weight: 550;
+}
+
+/* ============================================================
+   7. 三方案 token 对照表 + 落地说明
+   ============================================================ */
+.token-sec { max-width: 72rem; margin-inline: auto; padding: var(--sp-7) var(--sp-5); }
+.token-table { width: 100%; border-collapse: collapse; font-size: .8125rem; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.token-table th, .token-table td { padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border); text-align: left; }
+.token-table th { background: var(--panel-2); color: var(--muted); font-weight: 650; }
+.sw { display: inline-block; width: 1rem; height: 1rem; border-radius: 4px; border: 1px solid var(--border-strong); vertical-align: -3px; margin-right: var(--sp-2); }
+.adopt-notes { max-width: 72rem; margin-inline: auto; padding: 0 var(--sp-5) var(--sp-7); display: grid; gap: var(--sp-3); color: var(--muted); font-size: .875rem; }
+.adopt-notes b { color: var(--ink); }
+footer { border-top: 1px solid var(--border); padding: var(--sp-5); text-align: center; color: var(--subtle); font-size: .75rem; }
+</style>
+</head>
+<body>
+
+<!-- ═══════ 演示顶栏 ═══════ -->
+<div class="topbar">
+  <span class="topbar-brand"><img src="assets/logo.png" alt="华师令徽记">华师令 <span style="font-size:.75rem;color:var(--subtle)">Campus Request</span></span>
+  <nav aria-label="章节">
+    <a href="#landing">Landing</a><a href="#board">委托板</a><a href="#components">组件</a><a href="#dialogs">弹窗</a><a href="#tokens">三方案对照</a>
+  </nav>
+  <div class="theme-switch" role="group" aria-label="主题方案">
+    <button class="theme-btn" type="button" data-theme="parchment" aria-pressed="true">A 羊皮卷火漆</button>
+    <button class="theme-btn" type="button" data-theme="night" aria-pressed="false">B 星夜学院</button>
+    <button class="theme-btn" type="button" data-theme="vivid" aria-pressed="false">C 学院活力</button>
+  </div>
+  <button class="theme-btn" type="button" id="motionToggle" aria-pressed="true">动效：开</button>
+</div>
+
+<!-- ═══════ Landing ═══════ -->
+<section class="hero" id="landing">
+  <div class="particles" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="hero-eyebrow">冒险者公会 · 学院委托板已开门</p>
+      <h1>华师令<span class="latin">Campus Request</span></h1>
+      <p class="hero-tagline">把每一次课堂委托，变成一场值得炫耀的冒险——教师张榜，随机分派，机器鉴定，导师验收，令牌入袋。</p>
+      <div class="hero-cta">
+        <a class="btn btn-seal magnetic" href="#board">进入委托板</a>
+        <a class="btn btn-scroll ripple" href="#components">了解玩法</a>
+      </div>
+      <p class="hero-note">文案为提案演示稿 · 数据均为虚构 · 学号与手机号永不外显</p>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <!-- SVG 重绘徽记（描边版，可动效、可主题化；原 PNG 徽记居中叠加） -->
+      <svg class="crest" viewBox="0 0 120 140" aria-hidden="true">
+        <path class="draw" pathLength="1" d="M60 8 L96 20 L96 78 Q96 108 60 128 Q24 108 24 78 L24 20 Z"/>
+        <path class="draw soft" pathLength="1" d="M40 34 h40 M40 46 h40 M40 58 h24"/>
+        <path class="draw" pathLength="1" d="M38 30 h44 v40 h-44 z" opacity=".45"/>
+        <path class="draw" pathLength="1" d="M30 96 Q60 78 78 56"/>
+        <path class="draw" pathLength="1" d="M78 56 l0 -14"/>
+        <path class="draw" pathLength="1" d="M78 42 l14 5 -14 5"/>
+        <path class="draw soft" pathLength="1" d="M18 118 Q60 136 102 118"/>
+        <path class="draw soft" pathLength="1" d="M52 16 l4 -6 4 6"/>
+      </svg>
+      <img class="crest-png" src="assets/logo.png" alt="">
+      <div class="card-fan">
+        <article class="fan-card"><h3 class="fan-title">知乎「考研自习室」回答清单</h3><p class="fan-meta"><span class="rarity-label">普通</span><span class="fan-reward num">100 令</span></p></article>
+        <article class="fan-card"><h3 class="fan-title">小红书「秋日露营」数据采集</h3><p class="fan-meta"><span class="rarity-label">稀有</span><span class="fan-reward num">160 令</span></p></article>
+        <article class="fan-card"><h3 class="fan-title">B站「期末复习vlog」评论采集</h3><p class="fan-meta"><span class="rarity-label">传说</span><span class="fan-reward num">320 令</span></p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="stat"><b class="num" data-count="12">0</b><span>今日张榜委托</span></div>
+    <div class="stat"><b class="num" data-count="1024">0</b><span>在册冒险者</span></div>
+    <div class="stat"><b class="num" data-count="38600">0</b><span>已发放令牌</span></div>
+    <div class="stat"><b class="num" data-count="96">0</b><span>% 准时交付率</span></div>
+  </div>
+</div>
+
+<section class="journey" id="journey">
+  <h2>一张委托的完整旅程</h2>
+  <p class="sec-sub">从酒馆公告板到赏金入袋，状态机全程可见——机器鉴定先于导师验收，逾期仍有递减赏金而非倒扣。</p>
+  <div class="journey-map">
+    <svg class="journey-svg" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true">
+      <path id="journeyPath" pathLength="1" d="M10 12 C 25 2, 35 22, 50 12 S 75 2, 90 12"/>
+    </svg>
+    <div class="journey-step"><span class="journey-dot">壹</span><div><b>接取委托</b><span>随机分派关键词</span></div></div>
+    <div class="journey-step"><span class="journey-dot">贰</span><div><b>完成采集</b><span>DDL 前提交文件</span></div></div>
+    <div class="journey-step"><span class="journey-dot">叁</span><div><b>机器鉴定</b><span>格式与规则校验</span></div></div>
+    <div class="journey-step"><span class="journey-dot">肆</span><div><b>导师验收</b><span>人工审核发放</span></div></div>
+    <div class="journey-step"><span class="journey-dot">伍</span><div><b>领取赏金</b><span>令牌 / 荣誉 / 排行</span></div></div>
+  </div>
+</section>
+
+<!-- ═══════ 委托板 + 盖印台 ═══════ -->
+<section class="board-sec" id="board">
+  <div class="board-wrap">
+    <div>
+      <h2>今日委托板 · 可拖拽</h2>
+      <p class="sec-sub">拖动任意委托卡重新摆放（GSAP Draggable，松手弹回弹性落座）。火漆印颜色 = 稀有度，印章字符保持文字语义。</p>
+    </div>
+    <div class="stamp-bay-row">
+      <div class="seal-letter" id="sealLetter"><span>把右侧火漆印拖到这张委托函上，完成盖印</span></div>
+      <p class="stamp-hint">👆 签名级交互：盖印后火漆印痕以盖章动效落下，金屑四溅</p>
+      <div style="display:grid;place-items:center" id="stampBay">
+        <div class="seal-stamp" id="sealStamp" role="button" aria-label="火漆印，可拖动到委托函上盖印">令</div>
+      </div>
+    </div>
+    <div class="board-outer">
+      <div class="board-inner" id="questBoard">
+        <article class="quest-card" data-rarity="RARE">
+          <div class="quest-head"><h3 class="quest-title">小红书「秋日露营」数据采集</h3><span class="seal-badge" data-rarity="RARE" title="稀有">稀</span></div>
+          <p class="quest-meta"><span>小红书</span><span class="num">剩余 3 / 40</span><span>今天 18:00 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+        <article class="quest-card" data-rarity="LEGENDARY">
+          <div class="quest-head"><h3 class="quest-title">B站「期末复习vlog」评论采集</h3><span class="seal-badge" data-rarity="LEGENDARY" title="传说">传</span></div>
+          <p class="quest-meta"><span>哔哩哔哩</span><span class="num">剩余 2 / 8</span><span>10-15 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+        <article class="quest-card" data-rarity="EPIC">
+          <div class="quest-head"><h3 class="quest-title">抖音「城市夜跑」话题数据表</h3><span class="seal-badge" data-rarity="EPIC" title="史诗">史</span></div>
+          <p class="quest-meta"><span>抖音</span><span class="num">剩余 12 / 30</span><span>10-12 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+        <article class="quest-card" data-rarity="NORMAL">
+          <div class="quest-head"><h3 class="quest-title">知乎「考研自习室」回答清单</h3><span class="seal-badge" data-rarity="NORMAL" title="普通">普</span></div>
+          <p class="quest-meta"><span>知乎</span><span class="num">剩余 24 / 60</span><span>10-08 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+        <article class="quest-card" data-rarity="RARE">
+          <div class="quest-head"><h3 class="quest-title">微博「校园歌手大赛」热议榜</h3><span class="seal-badge" data-rarity="RARE" title="稀有">稀</span></div>
+          <p class="quest-meta"><span>微博</span><span class="num">剩余 9 / 25</span><span>10-10 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+        <article class="quest-card" data-rarity="NORMAL">
+          <div class="quest-head"><h3 class="quest-title">豆瓣「秋日书单」标记数据</h3><span class="seal-badge" data-rarity="NORMAL" title="普通">普</span></div>
+          <p class="quest-meta"><span>豆瓣</span><span class="num">剩余 30 / 50</span><span>10-18 截止</span></p>
+          <div class="quest-actions"><button class="btn btn-seal" type="button" data-open="dlg-accept">接取委托</button></div>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 组件区 ═══════ -->
+<section class="comp-sec" id="components">
+  <h2>组件样例（随主题切换）</h2>
+  <p class="sec-sub">同一套组件词汇在三个主题下共享结构，只替换 token——Teacher/Admin 工作台建议维持冷静密度，仅换色不改形。</p>
+  <div class="comp-grid">
+    <div class="comp-block">
+      <h3>按钮 — 火漆盖章按压 / 涟漪 / 磁吸 CTA</h3>
+      <div class="row">
+        <button class="btn btn-seal" type="button" data-stamp>接取委托</button>
+        <button class="btn btn-scroll ripple" type="button">查看卷宗</button>
+        <button class="btn btn-ghost" type="button">轻量操作</button>
+        <button class="btn btn-danger" type="button">放弃委托</button>
+        <button class="btn btn-seal" type="button" disabled><span class="spinner" style="width:1em;height:1em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>提交中…</button>
+      </div>
+      <p class="hint">主按钮按下有「盖火漆印」式下压回弹（scale .92 → back.out），点击处绽开印环。</p>
+    </div>
+    <div class="comp-block">
+      <h3>状态徽章 + 火漆稀有度</h3>
+      <div class="row">
+        <span class="badge badge-info">待提交</span><span class="badge badge-warning">鉴定中</span><span class="badge badge-warning">待验收</span>
+        <span class="badge badge-danger">需修改</span><span class="badge badge-success">已完成</span><span class="badge badge-muted">已过期</span>
+      </div>
+      <div class="row">
+        <span class="seal-badge" data-rarity="NORMAL">普</span><span class="rarity-label">普通</span>
+        <span class="seal-badge" data-rarity="RARE">稀</span><span class="rarity-label">稀有</span>
+        <span class="seal-badge" data-rarity="EPIC">史</span><span class="rarity-label">史诗</span>
+        <span class="seal-badge" data-rarity="LEGENDARY">传</span><span class="rarity-label">传说</span>
+      </div>
+    </div>
+    <div class="comp-block">
+      <h3>表单</h3>
+      <form class="comp-block" onsubmit="return false">
+        <div class="field">
+          <label for="q-nick">冒险者名号</label>
+          <input class="input" id="q-nick" value="林知遥">
+          <p class="hint">最长 16 字符，将署名于荣誉殿堂与公告区。</p>
+        </div>
+        <div class="field">
+          <label for="q-phone">信鸦绑定向导（手机号）</label>
+          <input class="input" id="q-phone" inputmode="numeric" aria-invalid="true" aria-describedby="q-phone-err" value="139">
+          <p class="field-err" id="q-phone-err">请输入 11 位手机号，一枚信鸦只服务一位冒险者。</p>
+        </div>
+      </form>
+    </div>
+    <div class="comp-block">
+      <h3>告示 / 告警</h3>
+      <div class="alert alert-warning"><p><span class="mark">!</span>距「秋日露营」截止不足 4 小时，赏金档位将降至 50%。</p></div>
+      <div class="alert alert-error"><p><span class="mark">!</span>鉴定未通过：3 处问题待修正（缺列「发布时间」等）。</p></div>
+      <div class="alert alert-success"><p><span class="mark">✓</span>导师验收通过，160 令已入袋。</p></div>
+    </div>
+    <div class="comp-block">
+      <h3>委托旅程进度（领取→提交→鉴定→验收→完成）</h3>
+      <div class="panel">
+        <ol class="steps" aria-label="委托进度">
+          <li class="step" data-state="done"><span class="step-dot"></span><span class="step-label">领取</span></li>
+          <li class="step" data-state="done"><span class="step-dot"></span><span class="step-label">提交</span></li>
+          <li class="step" data-state="current"><span class="step-dot"></span><span class="step-label">鉴定</span></li>
+          <li class="step"><span class="step-dot"></span><span class="step-label">验收</span></li>
+          <li class="step"><span class="step-dot"></span><span class="step-label">完成</span></li>
+        </ol>
+        <p class="hint" style="margin-top:var(--sp-2)">当前可获得 160 令（100% 档） · +4h 内 80 令 · +12h 内 32 令</p>
+      </div>
+    </div>
+    <div class="comp-block">
+      <h3>荣誉殿堂（低名次永不示警）</h3>
+      <div class="panel">
+        <div class="podium" aria-hidden="true">
+          <div class="podium-slot"><span>沈亦舟</span><span class="podium-bar">2</span></div>
+          <div class="podium-slot"><span>顾清和 ⭐</span><span class="podium-bar">1</span></div>
+          <div class="podium-slot"><span>赵望舒</span><span class="podium-bar">3</span></div>
+        </div>
+        <ol class="board-rows">
+          <li class="board-row"><span class="num">12</span><span class="board-nick">林知遥（我）</span><span class="num">160 令</span></li>
+          <li class="board-row"><span class="num">13</span><span class="board-nick">周屿</span><span class="num">150 令</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="comp-block">
+      <h3>信使通知（未读靠边框+字重，徽章为非颜色线索）</h3>
+      <ul class="notif-list">
+        <li class="notif-item">
+          <span class="notif-ico" aria-hidden="true">🦉</span>
+          <div class="notif-main">
+            <div class="notif-head"><span class="notif-type">截止提醒</span><span class="badge badge-info">未读</span><span class="notif-time num">14:30</span></div>
+            <p class="notif-title">「秋日露营」将于 18:00 截止</p>
+            <p class="notif-body">当前 100% 赏金档，逾期 4 小时内降至 50%。</p>
+          </div>
+        </li>
+        <li class="notif-item" data-read="true">
+          <span class="notif-ico" aria-hidden="true">📜</span>
+          <div class="notif-main">
+            <div class="notif-head"><span class="notif-type">验收结果</span><span class="notif-time num">昨日</span></div>
+            <p class="notif-title">「考研自习室」验收通过，100 令已入袋</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="comp-block">
+      <h3>加载 / 空态 / 评分 / 评论</h3>
+      <div class="skeleton-line" style="width:60%"></div>
+      <div class="skeleton-line"></div>
+      <div class="empty">
+        <span class="glyph" aria-hidden="true">🕯️</span>
+        <h3>委托板上暂无新榜</h3>
+        <p>导师可能尚未张榜，或名额已被领完——开启信鸽提醒，新榜发布即刻知晓。</p>
+        <button class="btn btn-scroll" type="button">开启提醒</button>
+      </div>
+      <div class="row stars" role="group" aria-label="任务评分">
+        <button class="star on" type="button" aria-pressed="true">★</button><button class="star on" type="button" aria-pressed="true">★</button><button class="star on" type="button" aria-pressed="true">★</button><button class="star on" type="button" aria-pressed="true">★</button><button class="star" type="button" aria-pressed="false">★</button>
+        <span class="hint num">4.6 · 23 人评分</span>
+      </div>
+      <div class="comment-thread">
+        <div class="comment-meta"><span class="comment-author">陈星野</span><span class="num">09-29 14:20</span></div>
+        <p class="comment-content">建议笔记链接单独一列，方便导师抽查原始数据。</p>
+        <div class="comment-actions">
+          <button class="chip-btn" type="button" aria-pressed="true">▲ <span class="num">12</span></button>
+          <button class="chip-btn" type="button" aria-pressed="false">▼</button>
+          <button class="chip-btn" type="button" aria-pressed="true">👍 <span class="num">8</span></button>
+          <button class="chip-btn" type="button">回复</button>
+          <button class="chip-btn" type="button" data-open="dlg-report">举报</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 弹窗 ═══════ -->
+<section class="dlg-sec" id="dialogs">
+  <h2>卷轴弹窗（打开时自上而下展开）</h2>
+  <p class="sec-sub">下方为静态外观示例；点「接取委托」可体验真实模态：卷轴展开入场 + 背板压暗 + Escape 关闭。</p>
+  <div class="dlg-stage">
+    <div class="demo-stage">
+      <dialog class="dialog" open aria-labelledby="d1t">
+        <form class="dialog-body" method="dialog">
+          <h3 class="dialog-title" id="d1t">接取这份委托？</h3>
+          <p class="hint">系统将从剩余名额中<b>随机分派</b>关键词，接取后不可挑选或更换。</p>
+          <div class="alert alert-warning"><p><span class="mark">!</span>每人最多同时持有 3 份待办委托，同一委托不可重复接取。</p></div>
+          <div class="dialog-actions">
+            <button class="btn btn-seal" type="button" data-close>掷骰接取</button>
+            <button class="btn btn-scroll" type="button" data-close>再逛逛</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+    <div class="demo-stage">
+      <dialog class="dialog" open aria-labelledby="d2t">
+        <div class="dialog-body">
+          <h3 class="dialog-title" id="d2t">申请兑换「课程平时分 +2」？</h3>
+          <p class="hint">将冻结 500 令，当前余额 1,600 令；审核通过前可撤销解冻。</p>
+          <div class="dialog-actions">
+            <button class="btn btn-seal" type="button" data-close>确认申请</button>
+            <button class="btn btn-scroll" type="button" data-close>取消</button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+    <div class="demo-stage">
+      <dialog class="dialog" open aria-labelledby="d3t">
+        <div class="dialog-body">
+          <h3 class="dialog-title" id="d3t">放弃「秋日露营」数据采集？</h3>
+          <div class="alert alert-error"><p><span class="mark">!</span>委托将回到公告板重新张榜，今日还剩 1 次主动放弃机会。</p></div>
+          <div class="dialog-actions">
+            <button class="btn btn-seal" type="button" data-close>继续完成</button>
+            <button class="btn btn-danger" type="button" data-close>确认放弃</button>
+          </div>
+        </div>
+      </dialog>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ 三方案对照 ═══════ -->
+<section class="token-sec" id="tokens">
+  <h2>三方案 token 对照（映射到现有 globals.css 变量名）</h2>
+  <div style="overflow-x:auto">
+  <table class="token-table">
+    <thead><tr><th>现有变量</th><th>A 羊皮卷火漆</th><th>B 星夜学院</th><th>C 学院活力</th></tr></thead>
+    <tbody>
+      <tr><td>--background</td><td><span class="sw" style="background:#f2e9d5"></span>羊皮纸暖白</td><td><span class="sw" style="background:#14162b"></span>午夜深蓝</td><td><span class="sw" style="background:#f4f6ff"></span>靛雾冷白</td></tr>
+      <tr><td>--surface-1</td><td><span class="sw" style="background:#faf3e3"></span>米纸</td><td><span class="sw" style="background:#1d2038"></span>夜幕面板</td><td><span class="sw" style="background:#ffffff"></span>纯白</td></tr>
+      <tr><td>--foreground</td><td><span class="sw" style="background:#33291c"></span>墨褐</td><td><span class="sw" style="background:#e9e7f7"></span>月白</td><td><span class="sw" style="background:#1d2440"></span>黛蓝</td></tr>
+      <tr><td>--primary</td><td><span class="sw" style="background:#9c2b23"></span>火漆红（印泥）</td><td><span class="sw" style="background:#d9a441"></span>烛光金</td><td><span class="sw" style="background:#4f46e5"></span>活力靛</td></tr>
+      <tr><td>--danger</td><td><span class="sw" style="background:#a3271e"></span>朱砂</td><td><span class="sw" style="background:#e0655f"></span>警戒赤</td><td><span class="sw" style="background:#e5484d"></span>警示红</td></tr>
+      <tr><td>--rarity-*</td><td colspan="3">三案共用「火漆印」造型：普=石墨 · 稀=蓝蜡 · 史=紫蜡 · 传说=金蜡（文案标签永远同行）</td></tr>
+      <tr><td>动效预算</td><td>烛尘漂浮 / 盖章按压 / 卷轴展开</td><td>星屑闪烁 / 烛光呼吸 / 星轨路径</td><td>纸屑粒子 / 果冻按钮 / 贴纸贴上</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="adopt-notes">
+  <p><b>落地衔接说明（重要）：</b>现行 docs/quality/frontend-design-system.md 明令「克制游戏化、禁装饰性渐变」，本页三案是对它的<b>提案式偏离</b>。若选定方案，需先修订设计系统文档与质量门禁（G 系规则），再按「token 层 → 壳 → 共享组件 → 学生端 → 教师端」顺序实施。</p>
+  <p><b>分层建议：</b>Landing 与学生端承载主题化冒险感（粒子 / 盖章 / 拖拽 / 卷轴弹窗均可上）；Teacher / Admin 保持现有冷静工作台，只同步色板（尤其 B 深色案可整体复用为暗色模式）；员工端不加装饰动效，维持「认证、审核、审计保持严肃」的既有约束。</p>
+  <p><b>命名层彩蛋（可选）：</b>积分→令牌 / 任务→委托 / 领取→接取（掷骰） / 兑换→赏金铺 / 排行→荣誉殿堂 / 通知→信使。产品语义与后端状态机不变，仅改文案层。</p>
+</section>
+
+<footer>华师令 Campus Request · 风格提案演示（A/B/C 可切换） · GSAP 动效 · 文案与数据均为演示虚构</footer>
+
+<!-- live 弹窗 -->
+<dialog class="dialog" id="dlg-accept" aria-labelledby="dlt1">
+  <form class="dialog-body" method="dialog">
+    <h3 class="dialog-title" id="dlt1">接取这份委托？</h3>
+    <p class="hint">系统将随机分派关键词；接取后不可挑选或更换，截止时间以委托卡所示为准。</p>
+    <div class="dialog-actions">
+      <button class="btn btn-seal" type="button" data-close data-toast="已掷骰接取！信使正在通知你分派结果">掷骰接取</button>
+      <button class="btn btn-scroll" type="button" data-close>再逛逛</button>
+    </div>
+  </form>
+</dialog>
+<dialog class="dialog" id="dlg-report" aria-labelledby="dlt2">
+  <form class="dialog-body" method="dialog">
+    <h3 class="dialog-title" id="dlt2">举报这条留言</h3>
+    <p class="hint">被举报内容保持可见，交由治理台裁定；恶意举报会被记录。</p>
+    <div class="dialog-actions">
+      <button class="btn btn-seal" type="button" data-close data-toast="举报已递交给治理台">提交举报</button>
+      <button class="btn btn-scroll" type="button" data-close>取消</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast-zone" id="toastZone" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  var hasGsap = typeof window.gsap !== "undefined";
+  var motionOn = true;
+  var mm = null;
+
+  if (hasGsap && window.ScrollTrigger && window.Draggable) {
+    gsap.registerPlugin(ScrollTrigger, Draggable);
+  } else { hasGsap = false; }
+
+  /* ---------- 主题切换 ---------- */
+  var themeBtns = document.querySelectorAll(".theme-btn[data-theme]");
+  themeBtns.forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.documentElement.setAttribute("data-theme", b.getAttribute("data-theme"));
+      themeBtns.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      if (hasGsap) ScrollTrigger.refresh();
+    });
+  });
+
+  /* ---------- 吐司 ---------- */
+  function toast(msg) {
+    var zone = document.getElementById("toastZone");
+    var t = document.createElement("div");
+    t.className = "toast"; t.textContent = msg;
+    zone.appendChild(t);
+    if (hasGsap && motionOn) {
+      gsap.from(t, { x: 90, opacity: 0, duration: .4, ease: "back.out(1.6)" });
+      gsap.to(t, { x: 90, opacity: 0, delay: 2.6, duration: .3, onComplete: function () { t.remove(); } });
+    } else { setTimeout(function () { t.remove(); }, 2600); }
+  }
+
+  /* ---------- 弹窗打开（卷轴展开） ---------- */
+  document.querySelectorAll("[data-open]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var dlg = document.getElementById(btn.getAttribute("data-open"));
+      if (!dlg) return;
+      dlg.showModal();
+      if (hasGsap && motionOn) gsap.from(dlg, { y: -18, opacity: 0, scaleY: .85, transformOrigin: "50% 0%", duration: .38, ease: "back.out(1.5)" });
+    });
+  });
+  document.querySelectorAll("[data-close]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var dlg = el.closest("dialog");
+      if (dlg) dlg.close();
+      if (el.dataset.toast) toast(el.dataset.toast);
+    });
+  });
+
+  /* ---------- 按钮：火漆按压 + 印环 + 涟漪 ---------- */
+  document.querySelectorAll(".btn-seal[data-stamp], .hero-cta .btn-seal").forEach(function (btn) {
+    btn.addEventListener("pointerdown", function () {
+      if (hasGsap && motionOn) gsap.to(btn, { scale: .92, rotation: -1.5, duration: .12, ease: "power2.in" });
+    });
+    btn.addEventListener("pointerup", function () {
+      if (hasGsap && motionOn) gsap.to(btn, { scale: 1, rotation: 0, duration: .45, ease: "back.out(2.2)" });
+      var ring = document.createElement("span"); ring.className = "stamp-ring";
+      btn.appendChild(ring);
+      if (hasGsap && motionOn) {
+        gsap.fromTo(ring, { scale: .7, opacity: .8 }, { scale: 1.5, opacity: 0, duration: .5, ease: "power2.out", onComplete: function () { ring.remove(); } });
+      } else { setTimeout(function () { ring.remove(); }, 500); }
+    });
+  });
+  document.querySelectorAll(".ripple").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      var rect = btn.getBoundingClientRect();
+      var r = document.createElement("span"); r.className = "ripple";
+      r.style.left = (e.clientX - rect.left - 4) + "px";
+      r.style.top = (e.clientY - rect.top - 4) + "px";
+      btn.appendChild(r);
+      if (hasGsap && motionOn) {
+        gsap.to(r, { scale: 22, opacity: 0, duration: .55, ease: "power2.out", onComplete: function () { r.remove(); } });
+      } else { setTimeout(function () { r.remove(); }, 550); }
+    });
+  });
+  /* 磁吸 CTA */
+  document.querySelectorAll(".magnetic").forEach(function (btn) {
+    if (!hasGsap) return;
+    var xTo = gsap.quickTo(btn, "x", { duration: .3, ease: "power3" });
+    var yTo = gsap.quickTo(btn, "y", { duration: .3, ease: "power3" });
+    btn.addEventListener("pointermove", function (e) {
+      var rect = btn.getBoundingClientRect();
+      xTo((e.clientX - rect.left - rect.width / 2) * .25);
+      yTo((e.clientY - rect.top - rect.height / 2) * .35);
+    });
+    btn.addEventListener("pointerleave", function () { xTo(0); yTo(0); });
+  });
+
+  /* ---------- 拖拽：委托卡 + 火漆盖印 ---------- */
+  function initDrag() {
+    if (!hasGsap || !window.Draggable) return;
+    Draggable.create(".quest-card", {
+      type: "x,y", bounds: "#questBoard", edgeResistance: .72, zIndexBoost: true,
+      onPress: function () { if (motionOn) gsap.to(this.target, { scale: 1.04, duration: .15 }); },
+      onRelease: function () { if (motionOn) gsap.to(this.target, { scale: 1, duration: .6, ease: "elastic.out(1,.55)" }); }
+    });
+    Draggable.create("#sealStamp", {
+      type: "x,y", bounds: ".board-wrap", onDragEnd: function () {
+        var stamped = this.hitTest("#sealLetter", "55%");
+        if (hasGsap && motionOn) gsap.to(this.target, { x: 0, y: 0, duration: .55, ease: stamped ? "back.inOut(1.8)" : "elastic.out(1,.5)" });
+        else { this.target.style.transform = ""; }
+        if (stamped) stampImprint();
+      }
+    });
+  }
+  function stampImprint() {
+    var letter = document.getElementById("sealLetter");
+    var imprints = letter.querySelectorAll(".seal-imprint");
+    if (imprints.length >= 2) imprints[0].remove();
+    var imp = document.createElement("div");
+    imp.className = "seal-imprint"; imp.textContent = "令";
+    letter.appendChild(imp);
+    if (hasGsap && motionOn) {
+      gsap.from(imp, { scale: 2.4, opacity: 0, rotation: -30, duration: .45, ease: "power4.in" });
+      for (var i = 0; i < 7; i++) {
+        var f = document.createElement("span");
+        f.style.cssText = "position:absolute;width:4px;height:4px;border-radius:50%;background:var(--gold);pointer-events:none;left:70%;bottom:20%";
+        letter.appendChild(f);
+        gsap.to(f, { x: (Math.random() - .5) * 140, y: -40 - Math.random() * 60, opacity: 0, duration: .8 + Math.random() * .4, ease: "power2.out", onComplete: function (el) { return function () { el.remove(); }; }(f) });
+      }
+    }
+    toast("已盖上华师令火漆印，等待信使送达");
+  }
+
+  /* ---------- 粒子 ---------- */
+  (function particles() {
+    var zone = document.querySelector(".particles");
+    if (!zone) return;
+    for (var i = 0; i < 16; i++) {
+      var s = document.createElement("span");
+      s.style.left = (4 + Math.random() * 92) + "%";
+      s.style.top = (8 + Math.random() * 80) + "%";
+      var size = 3 + Math.random() * 5;
+      s.style.width = size + "px"; s.style.height = size + "px";
+      zone.appendChild(s);
+    }
+  })();
+
+  /* ---------- 动效总装（matchMedia：尊重系统 reduced-motion） ---------- */
+  function buildAll() {
+    /* hero 时间轴 */
+    gsap.timeline({ defaults: { ease: "power3.out" } })
+      .from(".hero-eyebrow", { x: -24, opacity: 0, duration: .5 })
+      .from(".hero-title .char, .hero h1", { y: 34, opacity: 0, duration: .7, stagger: .05 }, .05)
+      .from(".hero-tagline, .hero-cta, .hero-note", { y: 22, opacity: 0, stagger: .1, duration: .55 }, .3)
+      .from(".crest .draw", { strokeDashoffset: 1, duration: 1.1, stagger: .06, ease: "power2.inOut" }, .2)
+      .from(".crest-png", { scale: .8, opacity: 0, duration: .7, ease: "back.out(1.6)" }, .45)
+      .from(".fan-card", { y: 110, opacity: 0, rotation: 6, stagger: .12, duration: .8, ease: "back.out(1.5)" }, .55);
+
+    /* 粒子漂浮 */
+    gsap.utils.toArray(".particles span").forEach(function (p, i) {
+      gsap.to(p, { y: "-=" + (14 + Math.random() * 26), opacity: .18, duration: 2 + Math.random() * 2.5, repeat: -1, yoyo: true, ease: "sine.inOut", delay: i * .12 });
+    });
+
+    /* 统计计数 */
+    document.querySelectorAll("[data-count]").forEach(function (el) {
+      var end = parseFloat(el.getAttribute("data-count"));
+      var o = { v: 0 };
+      gsap.to(o, {
+        v: end, duration: 1.4, ease: "power1.out",
+        onUpdate: function () { el.textContent = Math.round(o.v).toLocaleString("zh-CN"); },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true }
+      });
+    });
+
+    /* 旅程路径 scrub 描绘 + 步骤浮现 */
+    gsap.from("#journeyPath", { strokeDashoffset: 1, ease: "none", scrollTrigger: { trigger: "#journey", start: "top 78%", end: "center 55%", scrub: .5 } });
+    gsap.from(".journey-step", { y: 26, opacity: 0, stagger: .12, duration: .6, scrollTrigger: { trigger: "#journey", start: "top 72%", once: true } });
+
+    /* 区块浮现 */
+    gsap.utils.toArray(".comp-block, .board-outer, .dlg-stage > *, .token-table").forEach(function (el) {
+      gsap.from(el, { y: 26, opacity: 0, duration: .6, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 86%", once: true } });
+    });
+
+    /* 荣誉殿堂领奖台 */
+    gsap.from(".podium-slot", { y: 40, opacity: 0, stagger: .12, duration: .6, ease: "back.out(1.6)", scrollTrigger: { trigger: ".podium", start: "top 85%", once: true } });
+
+    initDrag();
+  }
+
+  function startMotion() {
+    motionOn = true;
+    if (!hasGsap) return;
+    if (mm) mm.revert();
+    mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", function () { buildAll(); return function () { gsap.set("*", { clearProps: "transform" }); }; });
+  }
+  function stopMotion() {
+    motionOn = false;
+    if (mm) { mm.revert(); mm = null; }
+    document.documentElement.classList.add("motion-off");
+  }
+
+  var toggle = document.getElementById("motionToggle");
+  toggle.addEventListener("click", function () {
+    motionOn = !motionOn;
+    toggle.textContent = motionOn ? "动效：开" : "动效：关";
+    toggle.setAttribute("aria-pressed", String(motionOn));
+    if (motionOn) { document.documentElement.classList.remove("motion-off"); startMotion(); }
+    else stopMotion();
+  });
+
+  /* 启动（系统 reduced-motion 时 matchMedia 不建动画 → 完整静态页） */
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    motionOn = false; document.documentElement.classList.add("motion-off");
+    toggle.textContent = "动效：关"; toggle.setAttribute("aria-pressed", "false");
+    initDrag(); /* 拖拽属输入交互，保留 */
+  } else {
+    startMotion();
+  }
+})();
+</script>
+</body>
+</html>
