@@ -2,7 +2,87 @@
 
 > Purpose: give frontend and design agents one stable visual language across Student, Teacher, and Admin surfaces.
 >
-> Product direction: **academic productivity with restrained gamification**.
+> Product direction: **academic productivity with restrained gamification**, themed as
+> **「羊皮卷与火漆」Parchment & Wax Seal（酒馆派遣 × 学院风）** per §0 (owner-approved 2026-09-30).
+
+## 0. Theme amendment: Parchment & Wax Seal（owner 批准 2026-09-30）
+
+本节是 owner 已批准的方向修订。凡本节与下文旧规则冲突，**以本节为准**；AGENTS.md 中
+「禁装饰渐变 / 克制游戏化」等视觉条款在 §0 圈定的表面上同样被本节取代（AGENTS.md 文件本体的
+相应措辞由 owner 择机更新）。产品语义、API、状态机、RBAC、隐私规则不受本节影响。
+
+### 0.1 生效范围（分层契约）
+
+- **主题化表面**：Landing、Student 全部页面（含委托板、详情、赏金铺、荣誉堂、信使）。
+- **维持冷静工作台**：Teacher、Admin、认证/2FA、审核与审计界面——只同步 §0.2 色板与
+  排版，不引入纹理粒子、hero wash、装饰动效（沿用既有 §9/§11 的严肃约束）。
+- 积分/兑换/审核等业务语义不变；「委托/令牌/接取/赏金铺/荣誉殿堂/信使」仅为文案层命名。
+
+### 0.2 Token 层（映射到 globals.css 既有变量名）
+
+| 变量 | 值（浅暖主题） | 说明 |
+| --- | --- | --- |
+| `--background` | `#f2e9d5` 羊皮纸暖白 | 页面底色 |
+| `--surface-1` / `--surface-2` | `#faf3e3` 米纸 / `#ece0c4` 旧纸 | 面板两级 |
+| `--foreground` / `--muted-foreground` / `--subtle-foreground` | `#33291c` 墨褐 / `#6f6350` / `#8c7f69` | 正文/辅助/最弱 |
+| `--border` / `--border-strong` | `#d9c9a6` / `#b9a377` 皮革褐 | 静边框 / 强边框 |
+| `--primary` / `--primary-strong` | `#9c2b23` 火漆红 / `#7e211b` | 主操作与当前导航 |
+| `--danger` / `--warning` / `--success` / `--info` | `#a3271e` 朱砂 / `#a8791c` / `#4a7c3f` / `#2f5d8a` | 语义不变 |
+| `--rarity-normal/rare/epic/legendary` | `#5b5648` / `#2f5d8a` / `#6d4a9e` / `#a8791c` | 难度火漆色，见 §0.3 |
+| `--font-display` | Georgia + 中宋/宋体 serif 栈 | 仅标题/徽记/数字大字 |
+| 形状 | radius 8 / 14 / 22px；`--shadow-1` 静物影、`--shadow-2` 弹层影 | 卡片仍靠边框+表面分层 |
+
+纹理：羊皮纸底纹与卷轴纸纹用**内联 SVG `feTurbulence` data-URI**（≤2KB、非阻塞），
+禁止外链位图纹理；表格数字沿用 `tabular-nums`。
+
+### 0.3 难度等级视觉体系（炉石式：徽记 + 边框双通道）
+
+难度=任务稀有度（NORMAL/RARE/EPIC/LEGENDARY），**文字标签永远同行渲染**，颜色永不单独表义。
+徽记与边框是两条独立通道，都必须呈现：
+
+| 难度 | 徽记（SVG，45° 内区分形状） | 卡片边缘效果 |
+| --- | --- | --- |
+| 普通 | 墨线**方戳**（双线框，纸底墨字） | 1.5px 墨褐单线框，哑光纸面 |
+| 稀有 | **圆蜡印**（蓝蜡渐变 + 蜡泪细节） | 2px 蓝蜡外框 + 内嵌 3px 纸底细线（双框），悬停冷光泽 |
+| 史诗 | **八角紫蜡印**（内环 + 花角） | 紫色花角饰件（四角 L 形）+ 内侧发丝线，轻晕影 |
+| 传说 | **金箔盾徽**（月桂弧 + 缎带 + 星） | 金箔渐变厚框（border-box 渐变）+ 四角饰件 + 顶嵌宝石，悬停一次性光泽扫过 |
+
+- 徽记为内联 SVG（`data-seal` 注入），禁用位图；`<text>` 保留汉字字符（普/稀/史/传）。
+- 传说**无待机循环动画**；光泽扫过仅 hover/focus-within 触发一次，`prefers-reduced-motion`
+  下退化为瞬时状态。
+- 徽记不大于任务标题的字重视觉权重；卡片标题仍是卡片的第一元素。
+
+### 0.4 卷轴弹窗（scroll dialog）规范
+
+- 结构：`上卷轴杆 + 羊皮纸身 + 下卷轴杆`。杆 = 木纹渐变圆杆 + 两端轴头；纸身 = 米纸 +
+  纸纹 + 上下内阴影；杆略宽于纸（纸从中抽出）。
+- 打开动画 = **展开**：纸身 `clip-path: inset(50% 0 50% 0 → 0)`（GSAP，150–450ms），
+  关闭快速收合；禁止整框 fade。
+- 弹窗语义不变：native `<dialog>`（焦点圈、Escape、背板关闭）；表单/告警/按钮沿用 §9 组件规则。
+- 纸面上所有文字对比度按 AA 校验；纹理不降低可读性。
+
+### 0.5 动效清单（Landing + Student 表面，GSAP 3）
+
+允许并已入库的动效（实现见 `docs/design/campusquest-demo-a.html`，生产化为 `motion/` 模块）：
+
+1. hero 编排：徽记 SVG 描边 → 标题/文案/CTA 依次入柱 → 委托卡发牌 stagger；
+2. 烛尘粒子（12–16 枚，纯装饰，`aria-hidden`，reduced-motion 直接隐藏）；
+3. 统计数字滚动计数（进视口一次）；
+4. 旅程/进度路径 scrub 描绘（ScrollTrigger）；
+5. 按钮：火漆按压（scale .92 + back.out 回弹 + 印环）、次按钮涟漪、CTA 磁吸（quickTo）；
+6. 委托卡拖拽（Draggable + bounds + 弹性落座）；
+7. 火漆盖印签名交互（拖印章 → hitTest → 印痕落下 + 金屑四溅）；
+8. 卷轴弹窗展开/收合；吐司滑入。
+
+硬约束：全部动效包在 `gsap.matchMedia("(prefers-reduced-motion: no-preference)")`，
+revert 后页面必须完整可见（无元素卡在隐藏态）；动效仅 transform/opacity/clip-path/stroke-dashoffset；
+不阻塞交互（pointer-events none 的装饰层）；员工端表面不引入以上任何一项。
+
+### 0.6 引用实现
+
+- 交互/视觉基线 demo：`docs/design/campusquest-demo-a.html`（A 方案产品化 demo，owner 审查用）。
+- 三方案对比的历史提案：`docs/design/quest-style-proposals.html`（B/C 方案留档，不再实施）。
+- 基线（旧克制风格）demo：`docs/design/ui-preview-demo.html`。
 
 ## 1. Design intent
 
@@ -21,11 +101,15 @@ The preferred reference family is modern productivity software and well-composed
 
 Use these adjectives when deciding between two visual treatments:
 
-**calm, precise, compact, optimistic, human, slightly playful**
+**calm, precise, compact, optimistic, human, slightly playful** — on themed Student/Landing
+surfaces (§0) extend with: **storybook, tactile, candlelit, adventurous**.
 
 Avoid:
 
 **flashy, casino-like, neon, glassy, futuristic-AI, overly corporate, cartoon-heavy**
+
+(§0 amendment: themed textures/parchment gradients are allowed on Student surfaces within the
+§0.2 palette; neon/glass/looping celebration stay forbidden everywhere.)
 
 Rarity labels and honors may be playful. Authentication, submission, review, account security, redemption approval, and Admin operations should remain visually serious.
 
@@ -330,14 +414,16 @@ Use product wording such as:
 
 Do not expose raw enum names such as UNDER_REVIEW.
 
-### Task rarity
+### Task rarity（§0.3 修订：难度等级双通道体系）
 
-Rarity treatment:
+Rarity treatment（难度=稀有度，普通→传说）：
 
-- compact badge;
-- optional small icon or edge accent;
-- never outrank task title;
-- no animated glow for Legendary.
+- **徽记 + 边框双通道**：每档难度有形状不同的 SVG 徽记（墨戳/圆蜡/八角蜡/金盾）与不同的
+  卡片边缘效果（单线/双框/花角/金箔框+宝石），见 §0.3 对照表；
+- 文字标签（普通/稀有/史诗/传说）永远与徽记同行渲染；颜色永不单独表义；
+- 徽记与边框不得大于任务标题的视觉权重；
+- 传说无待机循环动画；hover 光泽仅触发一次且 reduced-motion 退化；
+- NORMAL 保持安静——普通委托不因装饰而显得比高难委托更醒目。
 
 ### Forms
 
@@ -427,21 +513,26 @@ Do not render a broken page full of disabled controls. Explain that the user lac
 
 Motion is subordinate to comprehension.
 
-Use motion for:
+**§0.5 amendment（owner 批准 2026-09-30）**：Landing 与 Student 表面允许 §0.5 动效清单
+（GSAP 3：hero 编排、烛尘粒子、计数、路径 scrub、火漆按压/涟漪/磁吸、拖拽、盖印、卷轴弹窗、吐司）。
+其余旧规则继续约束 **Teacher/Admin/认证表面**：
+
+Use motion for (staff surfaces):
 
 - drawer and dialog transitions;
 - small list insertion or removal;
 - optimistic vote and reaction feedback;
 - subtle progress and state changes.
 
-Avoid:
+Avoid (all surfaces):
 
-- page-load choreography on operational pages;
+- page-load choreography on operational pages（Teacher/Admin 队列、表格）;
 - parallax;
-- decorative looping animation;
-- flashing rarity effects.
+- decorative looping animation（烛尘粒子除外——Student 表面白名单项）;
+- flashing rarity effects（传说光泽仅 hover 一次）.
 
-Respect prefers-reduced-motion.
+硬规则（对 §0.5 动效同样生效）：`prefers-reduced-motion` 下回退为完整静态页，无元素卡在
+隐藏态；动效仅 transform/opacity/clip-path/stroke-dashoffset；装饰层 pointer-events:none。
 
 ## 12. Accessibility baseline
 

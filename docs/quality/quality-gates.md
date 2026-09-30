@@ -62,6 +62,19 @@ Check:
 - mobile actions remain usable;
 - status text is understandable without color.
 
+### 2.1 Theme gate（羊皮卷与火漆 · design-system §0，owner 批准 2026-09-30）
+
+Student/Landing 表面在 §2 检查之外追加：
+
+- 难度等级走**双通道**：SVG 徽记（形状分档）与卡片边缘效果（单线/双框/花角/金箔框）同时存在，
+  且文字标签（普通/稀有/史诗/传说）与徽记同行渲染——颜色或形状都不是唯一载体；
+- 徽记/花角/宝石装饰不得压过任务标题的视觉权重；普通档保持视觉安静；
+- 卷轴弹窗有完整杆+纸结构；纸面纹理上正文/辅助/状态文字对比度满足 AA；
+- GSAP 动效全部位于 `prefers-reduced-motion` 守卫内，revert/关闭后页面完整可见、无元素卡在隐藏态；
+  装饰层（粒子/光泽/印环）`pointer-events:none` 且 `aria-hidden`；
+- Teacher/Admin/认证表面未引入主题纹理、粒子、hero wash 或装饰动效（仅同步色板）；
+- 动效只操作 transform/opacity/clip-path/stroke-dashoffset，无布局属性动画。
+
 For a new core page, capture screenshot evidence in the review or PR workflow when tooling supports it.
 
 ## 3. Frontend accessibility gate
@@ -282,3 +295,4 @@ Until that command exists, use the strongest currently implemented subset rather
 - **G16 每个派生缓存/投影需要重建故事。** 回答不了"Redis/worker/cache 全丢后从什么事实重建"的状态不应只存在于 projection。
 - **G17 Merge-carry 债务不得在合并中幸存。** 集成 PR 必须把 carry 当 checklist 全部关闭，而不是把 carry 文档合进 main 当未来承诺。
 - **G18 CI 必须测试组合边界。** 保持至少一组 production-like composition smoke tests，不 override 核心 provider。CI 绿 ≈ 领域规则正确 + 真实 wiring 可启动并跑通关键链路。
+- **G19 视觉主题遵循 design-system §0 分层契约（owner 批准 2026-09-30）。** 主题化（纹理/粒子/装饰动效/卷轴弹窗/难度双通道）仅限 Landing 与 Student 表面；Teacher/Admin/认证表面只同步色板、保持冷静工作台。GSAP 动效必须处于 reduced-motion 守卫内且静态回退完整；违反 §2.1 的视觉实现按 merge gate 阻塞。业务语义/API/隐私不受主题影响。
